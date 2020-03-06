@@ -17,7 +17,7 @@
 #
 
 Param(
-  [String]$pemaster = "pe-201910-master.puppetdebug.vlan" #required
+  [String]$pemaster = "puppet" #required
   [String]$adhost = "", #required Computer with ad on it or domain controller
   [String]$username = "" #required User who is able to look at ad and also install on machines ie administrator
   [String]$password = "" #required admin password
