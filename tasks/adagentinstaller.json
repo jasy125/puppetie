@@ -1,0 +1,7 @@
+{
+  "puppet_task_version": 1,
+  "supports_noop": false,
+  "description": "Installs Puppet Via AD on all nodes that match the AD search query",
+  "parameters": {
+  }
+}
