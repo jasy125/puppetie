@@ -26,7 +26,7 @@
     },
     "ou": {
       "description": "computers,belfast,uk comma separate this string",
-      "type": "Optional[String[1]]",
+      "type": "Optional[String[1]]"
     },
     "filter": {
       "description": "use the filter logic ie (name -like window-*)",
