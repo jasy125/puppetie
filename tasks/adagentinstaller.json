@@ -5,15 +5,15 @@
   "parameters": {
     "pemaster": {
       "description": "Puppet Master to bootstrap too",
-      "type": "[String[1]]"
+      "type": "String[1]"
     },
     "adhost": {
       "description": "required Computer with ad on it or domain controller",
-      "type": "[String[1]]"
+      "type": "String[1]"
     },
     "password": {
       "description": "admin password",
-      "type": "[String[1]]",
+      "type": "String[1]",
       "sensitive": true
     },
      "username": {
