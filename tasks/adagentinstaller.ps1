@@ -115,20 +115,27 @@ if ($computers.DNSHostName -ne "") {
                }
             
     
-    } -JobName "Puppet-Agent-Install" -ThrottleLimit $throttle -AsJob
+    }  -JobName "Puppet-Agent-Install" -ThrottleLimit $throttle -AsJob
 
         # loop to check status of running job and get job id
-        $jobpeagent | Wait-Job
+       
         $jobId = $jobpeagent.id
         while($jobpeagent.state -eq "Running") {
 
             Start-Sleep -s 15
         }
+        
+        $jobpeagent | Wait-Job
 
+        if($jobpeagent.state -eq "Failed"){
+            Get-Job | Format-List -Property * | out-file $logging -append
+        } 
+  
         # once complete return the content of the job to file?
         #Receive-Job -Id 
         
-        Receive-job -id $jobId | out-file $logging -append
+        $jobpeagent | Wait-Job | Receive-job -id $jobId | out-file $logging -append 
+        #Receive-job -id $jobId | out-file $logging -append
         write-output $computers | out-file $logging -append
 
 } else {
