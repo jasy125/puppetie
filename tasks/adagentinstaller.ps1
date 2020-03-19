@@ -28,6 +28,8 @@ param (
   [String]$logging = "c:/puppet-agent-installer.log"
 )
 
+
+$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $password
 $computers = $false
 $searchPath = $false
 $setFilter = $false
@@ -96,12 +98,10 @@ if ($computers.DNSHostName -ne "") {
     $jobpeagent = Invoke-Command -ComputerName $computers.DNSHostName -ScriptBlock {
         #check for puppet agent
         $compname =  $env:COMPUTERNAME
-        echo $compname
         $time = Get-Date -Format " MMddyyyy" 
-        echo $time
        
         if (Get-service puppet -ErrorAction SilentlyContinue) {
-            return "Puppet Already Installed on $compname"
+            echo  "Puppet Already Installed on $compname"
         } else {
             [System.Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; 
             [Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}; 
@@ -111,13 +111,13 @@ if ($computers.DNSHostName -ne "") {
         }
 
         if (Get-service puppet -ErrorAction SilentlyContinue) {
-            return "Puppet Agent Installed on - $compname at $time"
+            echo "Puppet Agent Installed on - $compname at $time"
             } else {
-               return "Agent Failed"
+               echo "Agent Failed"
                }
             
     
-    }  -JobName "Puppet-Agent-Install" -ThrottleLimit $throttle -AsJob | Wait-Job
+    } -JobName "Puppet-Agent-Install" -ThrottleLimit $throttle -AsJob | Wait-Job
 
         # loop to check status of running job and get job id
        
