@@ -96,7 +96,9 @@ if ($computers.DNSHostName -ne "") {
     $jobpeagent = Invoke-Command -ComputerName $computers.DNSHostName -ScriptBlock {
         #check for puppet agent
         $compname =  $env:COMPUTERNAME
+        echo $compname
         $time = Get-Date -Format " MMddyyyy" 
+        echo $time
        
         if (Get-service puppet -ErrorAction SilentlyContinue) {
             return "Puppet Already Installed on $compname"
