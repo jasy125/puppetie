@@ -99,7 +99,7 @@ if ($computers.DNSHostName -ne "") {
         $time = Get-Date -Format " MMddyyyy" 
        
         if (Get-service puppet -ErrorAction SilentlyContinue) {
-            echo  "Puppet Already Installed on $compname"
+            return  "Puppet Already Installed on $compname"
         } else {
             [System.Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; 
             [Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}; 
@@ -109,9 +109,9 @@ if ($computers.DNSHostName -ne "") {
         }
 
         if (Get-service puppet -ErrorAction SilentlyContinue) {
-            echo "Puppet Agent Installed on - $compname at $time"
+            return "Puppet Agent Installed on - $compname at $time"
             } else {
-               echo "Agent Failed"
+               return "Agent Failed"
                }
             
     
