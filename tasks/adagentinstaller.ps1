@@ -28,8 +28,6 @@ param (
   [String]$logging = "c:/puppet-agent-installer.log"
 )
 
-
-$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $password
 $computers = $false
 $searchPath = $false
 $setFilter = $false
