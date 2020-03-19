@@ -18,7 +18,7 @@
 
 param (
   [String]$pemaster = "puppet", #required
-  [String]$adhost = "", #required Computer with ad on it or domain controller
+  [String]$adhost = "", #required Computer with ad on it or domain controller Probably can Remove this value
   [String]$username = "", #required User who is able to look at ad and also install on machines ie administrator
   [String]$password = "", #required admin password
   [String]$dc = $false, # puppet,com comma separate this string
@@ -128,6 +128,7 @@ if ($computers.DNSHostName -ne "") {
         #Receive-Job -Id 
         
         Receive-job -id $jobId | out-file $logging -append
+        write-output $computers | out-file $logging -append
 
 } else {
     write-output "No Computers found"
