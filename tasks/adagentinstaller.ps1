@@ -124,9 +124,6 @@ if ($computers.DNSHostName -ne "") {
 
             Start-Sleep -s 15
         }
-
-        $jobpeagent | Wait-Job
-
          
         if($jobpeagent.state -eq "Failed"){
             Get-Job | Format-List -Property * | out-file $logging -append
