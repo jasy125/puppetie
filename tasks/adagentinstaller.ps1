@@ -73,11 +73,11 @@ if ($filter -ne $false) {
 #
 
 if ( $searchPath -ne $false -and $setFilter -eq $true ) {
-    $computers = Get-ADComputer -Filter { $filter } -SearchBase $searchPath | Select DNSHostName | Sort Name 
+    $computers = Get-ADComputer -Filter $filter -SearchBase $searchPath | Select DNSHostName | Sort Name 
 } elseif ( $searchPath -ne $false -and $setFilter -eq $false ) {
     $computers = Get-ADComputer -filter * -SearchBase $searchPath | Select DNSHostName | Sort Name 
 } elseif ( $searchPath -eq $false -and $setFilter -ne $false ){
-    $computers = Get-ADComputer -filter { $filter } | Select DNSHostName | Sort Name 
+    $computers = Get-ADComputer -filter $filter | Select DNSHostName | Sort Name 
 } else {
     $computers = Get-ADComputer -filter * | Select DNSHostName | Sort Name 
 }
