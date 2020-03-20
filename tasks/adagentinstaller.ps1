@@ -32,6 +32,9 @@ $computers = $false
 $searchPath = $false
 $setFilter = $false
 
+$pass = ConvertTo-SecureString -AsPlainText $password -Force
+$Cred = New-Object System.Management.Automation.PSCredential -ArgumentList $username,$pass
+
 # Step 2
 #
 # Check to see if we have a specified ou path it not just do all
@@ -115,7 +118,7 @@ if ($computers.DNSHostName -ne "") {
                }
             
     
-    } -JobName "Puppet-Agent-Install" -ThrottleLimit $throttle -AsJob 
+    } -credential $Cred -JobName "Puppet-Agent-Install" -ThrottleLimit $throttle -AsJob 
 
         # loop to check status of running job and get job id
         $jobId = $jobpeagent.id
