@@ -135,8 +135,13 @@ if ($computers.DNSHostName -ne "") {
         write-output "----------------------------------------------------" | out-file $logging -append
         Receive-job -id $jobId -Keep | out-file $logging -append
         write-output $computers | out-file $logging -append
+        
+        
         $joboutput = Receive-job -id $jobId
         write-output "Master Node : $pemaster"
+        if ($searchPath -eq $false) {
+           write-output "The OU path which was used $searchPath"
+        }
         write-output $joboutput
         write-output "see results of job $logging on the AD target host"
 
