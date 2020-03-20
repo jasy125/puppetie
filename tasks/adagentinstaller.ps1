@@ -17,10 +17,10 @@
 #
 
 param (
-  [String]$pemaster = "puppet", #required
-  [String]$adhost = "", #required Computer with ad on it or domain controller Probably can Remove this value
-  [String]$username = "", #required User who is able to look at ad and also install on machines ie administrator
-  [String]$password = "", #required admin password
+  [String]$pemaster, #required
+  [String]$adhost, #required Computer with ad on it or domain controller Probably can Remove this value
+  [String]$username, #required User who is able to look at ad and also install on machines ie administrator
+  [String]$password, #required admin password
   [String]$dc = $false, # puppet,com comma separate this string
   [String]$ou = $false, # computers,belfast,uk comma separate this string
   [String]$filter = $false, # use the filter logic ie (name -like "window-*") 
