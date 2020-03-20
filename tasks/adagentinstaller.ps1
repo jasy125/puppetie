@@ -99,10 +99,11 @@ if ($computers.DNSHostName -ne "") {
     $jobpeagent = Invoke-Command -ComputerName $computers.DNSHostName -ScriptBlock {
         #check for puppet agent
         $compname =  $env:COMPUTERNAME
-        $time = Get-Date -Format " MMddyyyy" 
+        $time = Get-Date -Format "MMddyyyy" 
        
         if (Get-service puppet -ErrorAction SilentlyContinue) {
-            return "Puppet Already Installed on $compname"
+            $puppetinstalled = Get-WmiObject Win32_Product | Where-Object { $_.Name -Like "Puppet*"}   | Select-Object Name,Version
+            return "Puppet Already Installed on $compname - ( Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version)"
         } else {
             [System.Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; 
             [Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}; 
@@ -112,7 +113,7 @@ if ($computers.DNSHostName -ne "") {
         }
 
         if (Get-service puppet -ErrorAction SilentlyContinue) {
-            return "Puppet Agent Installed on - $compname at $time"
+            return "Puppet Agent is now Installed on - $compname at $time"
             } else {
                return "Agent Failed- $compname"
                }
