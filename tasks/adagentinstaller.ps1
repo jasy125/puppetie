@@ -73,8 +73,8 @@ if ($filter -ne $false) {
 
 # Step 4
 #
-# Function to get all the computer objects based on the collected info
-#
+# Get all the computer objects based on the collected info
+# TODO build this into a function
 #
 
 if ( $searchPath -ne $false -and $setFilter -eq $true ) {
