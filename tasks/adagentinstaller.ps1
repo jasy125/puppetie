@@ -34,7 +34,6 @@ $searchPath = $false
 $setFilter = $false
 $throttle = 2
 $logging = "c:/puppet-agent-installer.log"
-$pemaster = "pe-201910-master.puppetdebug.vlan"
 # Step 2
 #
 # Check to see if we have a specified ou path it not just do all
