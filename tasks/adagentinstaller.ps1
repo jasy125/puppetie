@@ -35,6 +35,8 @@ $setFilter = $false
 $pass = ConvertTo-SecureString -AsPlainText $password -Force
 $Cred = New-Object System.Management.Automation.PSCredential -ArgumentList $username,$pass
 
+
+
 # Step 2
 #
 # Check to see if we have a specified ou path it not just do all
