@@ -7,18 +7,18 @@
       "description": "Puppet Master to bootstrap too",
       "type": "String[1]"
     },
-      "adhost": {
+    "adhost": {
       "description": "required Computer with ad on it or domain controller",
-      "type": "String[1]"
-    },
-    "username": {
-      "description": "User who is able to look at ad and also install on machines ie administrator",
       "type": "String[1]"
     },
     "password": {
       "description": "admin password",
       "type": "String[1]",
       "sensitive": true
+    },
+     "username": {
+      "description": "User who is able to look at ad and also install on machines ie administrator",
+      "type": "String[1]"
     },
     "dc": {
       "description": "puppet,com comma separate this string",
