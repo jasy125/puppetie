@@ -115,7 +115,7 @@ if ($computers.DNSHostName -ne "") {
                }
             
     
-    } -JobName "Puppet-Agent-Install" -ThrottleLimit $throttle -AsJob | Wait-Job
+    } -JobName "Puppet-Agent-Install" -ThrottleLimit $throttle -AsJob
 
         # loop to check status of running job and get job id
        
