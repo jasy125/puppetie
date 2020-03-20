@@ -132,31 +132,26 @@ if ($computers.DNSHostName -ne "" ) {
             Start-Sleep -s 15
         }
     }
-        # once complete return the content of the job to file?
-        #Receive-Job -Id 
+        # once complete return the content of the job to file
         write-output "----------------------------------------------------" | out-file $logging -append
+        write-ouput " PE Master : $pemaster" | out-file $logging -append
         if ($searchPath -ne $false) {
-          write-output "Targe out : $searchPath" | out-file $logging -append
+          write-output "Targe ou : $searchPath" | out-file $logging -append
         }
         if ($setFilter -eq $true){
             write-output "Filter Used : $filter" | out-file $logging -append
         }
-        write-output "Number of installs are limited to batches of $throttle" | out-file $logging -append
-        write-output "$($computers.DNSHostName.length) Computer will have the puppet agent installed these are :" | out-file $logging -append
+        write-output "Number of installs where limited to batches of $throttle at a time" | out-file $logging -append
+        write-output "$($computers.DNSHostName.length) Computer/s will have the puppet agent installed, these are :" | out-file $logging -append
         write-output $computers.DNSHostName | out-file $logging -append
-        write-output "----------------------------------------------------" | out-file $logging -append
-        if($dryrun -eq $false) {
-            Receive-job -id $jobId -Keep | out-file $logging -append
-            write-output $computers | out-file $logging -append
         
+        
+        if($dryrun -eq $false) {
             $joboutput = Receive-job -id $jobId
-            write-output "Master Node : $pemaster"
-            if ($searchPath -ne $false) {
-            write-output "The OU path which was used $searchPath"
-            }
+            $joboutput | out-file $logging -append
             write-output $joboutput
         }
-        write-output "See results of job $logging on the AD target host also"
+        write-output "See results of job at $logging on the AD target host"
 
 } else {
     write-output "No Computers found"
