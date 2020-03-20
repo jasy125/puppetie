@@ -132,9 +132,9 @@ if ($computers.DNSHostName -ne "") {
         write-output "----------------------------------------------------" | out-file $logging -append
         Receive-job -id $jobId -Keep | out-file $logging -append
         write-output $computers | out-file $logging -append
-
+        $joboutput = Receive-job -id $jobId
         write-output $pemaster
-        write-output Receive-job -id $jobId
+        write-output $joboutput
 
 } else {
     write-output "No Computers found"
