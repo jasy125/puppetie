@@ -54,6 +54,10 @@ To use this task by default will run against then entire Domain unless you set t
 
 Username : The Domain User who will have access to install and make changes to systems.
 
+```
+username = puppetlocal\Administrator
+```
+
 Password : The Domain User Account
 
 #### Optional
@@ -62,18 +66,18 @@ pemaster : The Pe Master is optional if the System going to be running the comma
 
 adhost : Will be used in a later revision.
 
-dc : Domain Name such as puppet.com, this should be written as puppet,com. This should be used with an OU
+dc : Domain Name such as puppet.local, this should be written as puppet,local. This should be used with an OU
 
 ```
-puppet.com
+puppet.local
 
-dc = puppet,com
+dc = puppet,local
 ```
 
 ou : Organisational Unit such as in your tree puppet -> workstations. This should be used with DC
 
 ```
-puppet.com 
+puppet.local 
       - Puppet
           - Workstations
           - Servers

@@ -35,7 +35,7 @@ $setFilter = $false
 
 $pass = ConvertTo-SecureString -AsPlainText $password -Force
 $Cred = New-Object System.Management.Automation.PSCredential -ArgumentList $username,$pass
-
+$domain = (Get-WmiObject Win32_ComputerSystem).Domain # Not used yet but will replace having to set the DC but this gets top level. Maybe only use if dc isnt set and ou is 
 
 
 # Step 2
