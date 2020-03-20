@@ -89,7 +89,7 @@ ou = servers,puppet
 filter : If you want to apply a filter to the search in the ou, this can be used with dc and ou but not required.
 
 ```
-puppet.com 
+puppet.local 
       - Puppet
           - Workstations
              - Win10-1
