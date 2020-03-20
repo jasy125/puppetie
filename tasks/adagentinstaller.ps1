@@ -142,7 +142,7 @@ if ($computers.DNSHostName -ne "" ) {
             write-output "Filter Used : $filter" | out-file $logging -append
         }
         write-output "Number of installs are limited to batches of $throttle" | out-file $logging -append
-        write-output "Computer that are to have the puppet agent installed on are :" | out-file $logging -append
+        write-output "$($computers.DNSHostName.length) Computer will have the puppet agent installed these are :" | out-file $logging -append
         write-output $computers.DNSHostName | out-file $logging -append
         write-output "----------------------------------------------------" | out-file $logging -append
         if($dryrun -eq $false) {
