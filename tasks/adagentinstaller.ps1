@@ -54,7 +54,11 @@ return $searchPath
 
 if ( $dc -ne $false -and $ou -ne $false ) {
    $searchPath = buildOU $dc $ou
-} 
+} elseif ($dc -eq $false -and $ou -ne $false) {
+    $domain = (Get-WmiObject Win32_ComputerSystem).Domain #grab the local domain of this machine
+    $dc = $domain.replace(".",",")
+    $searchPath = buildOU $dc $ou
+}
 
 # Step 3
 #
