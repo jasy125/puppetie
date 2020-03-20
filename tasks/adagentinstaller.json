@@ -9,7 +9,7 @@
     },
     "adhost": {
       "description": "required Computer with ad on it or domain controller",
-      "type": "String[1]"
+      "type": "Optional[String[1]]"
     },
     "password": {
       "description": "admin password",

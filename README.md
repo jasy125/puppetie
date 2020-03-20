@@ -35,17 +35,77 @@ If there's more that they should know about, though, this is the place to mentio
 
 ### Setup Requirements **OPTIONAL**
 
-If your module requires anything extra before setting up (pluginsync enabled, another module, etc.), mention it here.
+Requires 
 
-If your most recent release breaks compatibility or requires particular steps for upgrading, you might want to include an additional "Upgrading" section here.
+Active Directory User and Computers
+Powershell V3 or later
 
 ### Beginning with windowstasks
 
-The very basic steps needed for a user to get the module up and running. This can include setup steps, if necessary, or it can be an example of the most basic use of the module.
+You can include this Task by first forking the module and then installing with your Puppetfile
+
+```
+mod 'puppetie'
+  git : 'https://github.com/jasy125/puppetie' ( Update to path to your fork )
+```
 
 ## Usage
 
-Include usage examples for common use cases in the **Usage** section. Show your users how to use your module to solve problems, and be sure to include code examples. Include three to five examples of the most important or common tasks a user can accomplish with your module. Show users how to accomplish more complex tasks that involve different types, classes, and functions working in tandem.
+To use this task by default will run against then entire Domain unless you set the OU and DC.
+
+Required
+
+Username : The Domain User who will have access to install and make changes to systems.
+Password : The Domain User Account
+
+Optional
+
+pemaster : The Pe Master is optional if the System going to be running the command has the server value set in the puppet.conf as this pulls this value using - puppet config print server
+
+adhost : Will be used in a later revision.
+
+dc : Domain Name such as puppet.com, this should be written as puppet,com. This should be used with an OU
+
+```
+puppet.com
+
+dc = puppet,com
+```
+
+ou : Organisational Unit such as in your tree puppet -> workstations. This should be used with DC
+
+```
+puppet.com 
+      - Puppet
+          - Workstations
+          - Servers
+
+ou = workstations,puppet
+ou = servers,puppet
+```
+
+filter : If you want to apply a filter to the search in the ou, this can be used with dc and ou but not required.
+
+```
+puppet.com 
+      - Puppet
+          - Workstations
+             - Win10-1
+             - Win10-2
+             - WinXp-1
+          - Servers
+
+
+filter = (Name -like "Win10*")
+   Returns Win10-1 Win10-2
+       
+```
+
+throttle : Number of jobs to run in parallel, by default this is set to two increase to as many as you want to run at the same time.
+
+logging : This is the location of the log file, by default it is created on the C Drive of the system running the task. This can be any location as long as the system running the task can access it.
+
+dryrun : If you want to test the settings before running for real. Default is false ( Still work in progress for additional logging )
 
 ## Reference
 
@@ -74,13 +134,16 @@ Enables vocalization in your cat. Valid options: 'string'.
 Default: 'medium-loud'.
 ```
 
+
+
 ## Limitations
 
-In the Limitations section, list any incompatibilities, known issues, or other warnings.
+This needs to be run on an System that has Active Directory Users and Computers or directly on a Domain Controller
+Also you will need to set the pemaster value if the host you are going to run this on does not have a puppet.conf file with the server value set. Also you can point this at any master by using this field.
 
 ## Development
 
-In the Development section, tell other users the ground rules for contributing to your project and how they should submit their work.
+Please fork this repo and not run directly from it as changes may happen.
 
 ## Release Notes/Contributors/Etc. **Optional**
 
