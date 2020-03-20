@@ -103,7 +103,7 @@ if ($computers.DNSHostName -ne "") {
        
         if (Get-service puppet -ErrorAction SilentlyContinue) {
             $puppetinstalled = Get-WmiObject Win32_Product | Where-Object { $_.Name -Like "Puppet*"}   | Select-Object Name,Version
-            return "Puppet Already Installed on $compname - ( Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version)"
+            return "Puppet Already Installed on $compname - ( Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
         } else {
             [System.Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; 
             [Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}; 
