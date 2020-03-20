@@ -39,6 +39,10 @@
     "logging": {
       "description": "Log output of the agent installer",
       "type": "Optional[String[1]]"
+    },
+    "dryrun": {
+      "description": "Start installing or give list of computers from options",
+      "type": "Optional[String[1]]"
     }
   }
 }

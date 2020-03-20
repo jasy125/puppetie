@@ -25,7 +25,8 @@ param (
   [String]$ou = $false, # computers,belfast,uk comma separate this string
   [String]$filter = $false, # use the filter logic ie (name -like "window-*") 
   [String]$throttle = 2,
-  [String]$logging = "c:/puppet-agent-installer.log"
+  [String]$logging = "c:/puppet-agent-installer.log",
+  [String]$dryrun = $false
 )
 
 $computers = $false
@@ -95,33 +96,34 @@ if ( $searchPath -ne $false -and $setFilter -eq $true ) {
 # connect to the computer and check for existance of puppet agent service
 # May need to pass credentials 
 
-if ($computers.DNSHostName -ne "") {
+if ($computers.DNSHostName -ne "" ) {
 
+    if ( $dryrun -eq $false ) {
     # this will us http and winrm i think alternative is to use start-job
-    $jobpeagent = Invoke-Command -ComputerName $computers.DNSHostName -ScriptBlock {
-        #check for puppet agent
-        $compname =  $env:COMPUTERNAME
-        $time = Get-Date -Format "MMddyyyy" 
-       
-        if (Get-service puppet -ErrorAction SilentlyContinue) {
-            $puppetinstalled = Get-WmiObject Win32_Product | Where-Object { $_.Name -Like "Puppet Agent*"}   | Select-Object Name,Version
-            return "Puppet Already Installed on $compname - ( Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
-        } else {
-            [System.Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; 
-            [Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}; 
-            $webClient = New-Object System.Net.WebClient; 
-            $webClient.DownloadFile('https://' + $using:pemaster + ':8140/packages/current/install.ps1', 'install.ps1') 
-            & C:\Windows\System32\install.ps1;
-        }
-
-        if (Get-service puppet -ErrorAction SilentlyContinue) {
-            return "Puppet Agent is now Installed on - $compname at $time"
+        $jobpeagent = Invoke-Command -ComputerName $computers.DNSHostName -ScriptBlock {
+            #check for puppet agent
+            $compname =  $env:COMPUTERNAME
+            $time = Get-Date -Format "MMddyyyy" 
+        
+            if (Get-service puppet -ErrorAction SilentlyContinue) {
+                $puppetinstalled = Get-WmiObject Win32_Product | Where-Object { $_.Name -Like "Puppet Agent*"}   | Select-Object Name,Version
+                return "Puppet Already Installed on $compname - ( Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
             } else {
-               return "Agent Failed- $compname"
-               }
-            
-    
-    } -credential $Cred -JobName "Puppet-Agent-Install" -ThrottleLimit $throttle -AsJob 
+                [System.Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; 
+                [Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}; 
+                $webClient = New-Object System.Net.WebClient; 
+                $webClient.DownloadFile('https://' + $using:pemaster + ':8140/packages/current/install.ps1', 'install.ps1') 
+                & C:\Windows\System32\install.ps1;
+            }
+
+            if (Get-service puppet -ErrorAction SilentlyContinue) {
+                return "Puppet Agent is now Installed on - $compname at $time"
+                } else {
+                return "Agent Failed- $compname"
+                }
+                
+        
+        } -credential $Cred -JobName "Puppet-Agent-Install" -ThrottleLimit $throttle -AsJob 
 
         # loop to check status of running job and get job id
         $jobId = $jobpeagent.id
@@ -129,21 +131,32 @@ if ($computers.DNSHostName -ne "") {
 
             Start-Sleep -s 15
         }
-
+    }
         # once complete return the content of the job to file?
         #Receive-Job -Id 
         write-output "----------------------------------------------------" | out-file $logging -append
-        Receive-job -id $jobId -Keep | out-file $logging -append
-        write-output $computers | out-file $logging -append
-        
-        
-        $joboutput = Receive-job -id $jobId
-        write-output "Master Node : $pemaster"
-        if ($searchPath -eq $false) {
-           write-output "The OU path which was used $searchPath"
+        if ($searchPath -ne $false) {
+          write-output "Targe out : $searchPath" | out-file $logging -append
         }
-        write-output $joboutput
-        write-output "see results of job $logging on the AD target host"
+        if ($setFilter -eq $true){
+            write-output "Filter Used : $filter" | out-file $logging -append
+        }
+        write-output "Number of installs are limited to batches of $throttle" | out-file $logging -append
+        write-output "Computer that are to have the puppet agent installed on are :" | out-file $logging -append
+        write-output $computers.DNSHostName | out-file $logging -append
+        write-output "----------------------------------------------------" | out-file $logging -append
+        if($dryrun -eq $false) {
+            Receive-job -id $jobId -Keep | out-file $logging -append
+            write-output $computers | out-file $logging -append
+        
+            $joboutput = Receive-job -id $jobId
+            write-output "Master Node : $pemaster"
+            if ($searchPath -ne $false) {
+            write-output "The OU path which was used $searchPath"
+            }
+            write-output $joboutput
+        }
+        write-output "See results of job $logging on the AD target host also"
 
 } else {
     write-output "No Computers found"
