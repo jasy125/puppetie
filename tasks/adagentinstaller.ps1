@@ -17,10 +17,10 @@
 #
 
 param (
-  [String]$pemaster = "pe-201910-master.puppetdebug.vlan", #required
-  [String]$adhost ="",
-  [String]$password = "",
-  [String]$username = "",
+  [String]$pemaster, #required
+  [String]$adhost,
+  [String]$password,
+  [String]$username,
   [String]$dc = $false, # puppet,com comma separate this string
   [String]$ou = $false, # computers,belfast,uk comma separate this string
   [String]$filter = $false, # use the filter logic ie (name -like "window-*") 
