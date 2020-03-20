@@ -17,9 +17,7 @@ The README template below provides a starting point with details about what info
 
 ## Description
 
-Briefly tell users why they might want to use your module. Explain what your module does and what kind of problems users can solve with it.
-
-This should be a fairly short description helps the user decide if your module is what they want.
+This Task will allow you to pull Computers from AD and install the puppet agent on them from your Puppet Master
 
 ## Setup
 
@@ -35,9 +33,8 @@ If there's more that they should know about, though, this is the place to mentio
 
 ### Setup Requirements **OPTIONAL**
 
-Requires 
-
 Active Directory User and Computers
+
 Powershell V3 or later
 
 ### Beginning with windowstasks
@@ -53,13 +50,13 @@ mod 'puppetie'
 
 To use this task by default will run against then entire Domain unless you set the OU and DC.
 
-### Required
+#### Required
 
 Username : The Domain User who will have access to install and make changes to systems.
 
 Password : The Domain User Account
 
-### Optional
+#### Optional
 
 pemaster : The Pe Master is optional if the System going to be running the command has the server value set in the puppet.conf as this pulls this value using - puppet config print server
 
