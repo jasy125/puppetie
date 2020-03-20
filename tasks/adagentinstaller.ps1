@@ -133,7 +133,7 @@ if ($computers.DNSHostName -ne "") {
         Receive-job -id $jobId -Keep | out-file $logging -append
         write-output $computers | out-file $logging -append
         $joboutput = Receive-job -id $jobId
-        write-output $pemaster
+        write-output "Master Node : $pemaster"
         write-output $joboutput
         write-output "see results of job $logging on the AD target host"
 
