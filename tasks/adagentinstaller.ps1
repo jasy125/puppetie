@@ -1,4 +1,4 @@
-# windows AD Installer
+ # windows AD Installer
 # Requirements 
 #
 #
@@ -17,10 +17,10 @@
 #
 
 param (
-  [String]$pemaster, #required
-  [String]$adhost,
-  [String]$password,
-  [String]$username,
+  [String]$pemaster = "puppet", #required
+  [String]$adhost = "", #required Computer with ad on it or domain controller Probably can Remove this value
+  [String]$username = "", #required User who is able to look at ad and also install on machines ie administrator
+  [String]$password = "", #required admin password
   [String]$dc = $false, # puppet,com comma separate this string
   [String]$ou = $false, # computers,belfast,uk comma separate this string
   [String]$filter = $false, # use the filter logic ie (name -like "window-*") 
@@ -95,11 +95,11 @@ if ($computers.DNSHostName -ne "") {
     # this will us http and winrm i think alternative is to use start-job
     $jobpeagent = Invoke-Command -ComputerName $computers.DNSHostName -ScriptBlock {
         #check for puppet agent
-        $compname =  $env:COMPUTERNAME;
-        $time = Get-Date -Format "MMddyyyy"; 
+        $compname =  $env:COMPUTERNAME
+        $time = Get-Date -Format "MMddyyyy" 
        
         if (Get-service puppet -ErrorAction SilentlyContinue) {
-            return  "Puppet Already Installed on $compname"
+            return "Puppet Already Installed on $compname"
         } else {
             [System.Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; 
             [Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}; 
@@ -115,30 +115,31 @@ if ($computers.DNSHostName -ne "") {
                }
             
     
-    } -JobName "Puppet-Agent-Install" -ThrottleLimit $throttle -AsJob
+    } -JobName "Puppet-Agent-Install" -ThrottleLimit $throttle -AsJob | Wait-Job
 
+    
         # loop to check status of running job and get job id
        
+
         $jobId = $jobpeagent.id
         while($jobpeagent.state -eq "Running") {
 
             Start-Sleep -s 15
         }
-         
+
         if($jobpeagent.state -eq "Failed"){
-            Get-Job | Format-List -Property * | out-file $logging -append
-            $jobError = $failJob.ChildJobs[0].JobStateInfo.Reason.Message
-            $jobError | out-file $logging -Append
-          }  
-  
-  
+          Get-Job | Format-List -Property * | out-file $logging -append
+          $jobError = $failJob.ChildJobs[0].JobStateInfo.Reason.Message
+          $jobError | out-file $logging -Append
+        } 
+
         # once complete return the content of the job to file?
         #Receive-Job -Id 
-        
-        Receive-job -id $jobId | out-file $logging -append 
-        write-output $computers | out-file $logging -append
+         
+        Receive-job -id $jobId | out-file $logging -append
 
 } else {
-    write-output "No Computers found"
+    write-output "No Computers found" | out-file $logging -append
 } 
 
+ 
