@@ -53,12 +53,12 @@ mod 'puppetie'
 
 To use this task by default will run against then entire Domain unless you set the OU and DC.
 
-Required
+# Required
 
 Username : The Domain User who will have access to install and make changes to systems.
 Password : The Domain User Account
 
-Optional
+# Optional
 
 pemaster : The Pe Master is optional if the System going to be running the command has the server value set in the puppet.conf as this pulls this value using - puppet config print server
 
