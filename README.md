@@ -151,7 +151,5 @@ Please fork this repo and not run directly from it as changes may happen.
 
 Contributers 
 
-
-  Jasy125
-
-  MartyEwings
+   - Jasy125
+   - MartyEwings
