@@ -92,7 +92,7 @@ if ($computers.DNSHostName -ne "") {
     # this will us http and winrm i think alternative is to use start-job
     $jobpeagent = Invoke-Command -ComputerName $computers.DNSHostName -ScriptBlock {
         #check for puppet agent
-        $compname =  $env:COMPUTERNAME;
+    <#    $compname =  $env:COMPUTERNAME;
         $time = Get-Date -Format "MMddyyyy"; 
        
         if (Get-service puppet -ErrorAction SilentlyContinue) {
@@ -111,7 +111,7 @@ if ($computers.DNSHostName -ne "") {
                return "Agent Failed"
                }
             
-    
+    #>
     } -JobName "Puppet-Agent-Install" -ThrottleLimit $throttle -AsJob | Wait-Job
 
         # loop to check status of running job and get job id
