@@ -17,7 +17,7 @@
 #
 
 param (
-  [String]$pemaster = "puppet", #required
+  [String]$pemaster = $(puppet config print server), #required
   [String]$adhost = "", #required Computer with ad on it or domain controller Probably can Remove this value
   [String]$username = "", #required User who is able to look at ad and also install on machines ie administrator
   [String]$password = "", #required admin password
@@ -114,7 +114,7 @@ if ($computers.DNSHostName -ne "") {
         if (Get-service puppet -ErrorAction SilentlyContinue) {
             return "Puppet Agent Installed on - $compname at $time"
             } else {
-               return "Agent Failed"
+               return "Agent Failed- $compname"
                }
             
     
@@ -129,9 +129,12 @@ if ($computers.DNSHostName -ne "") {
 
         # once complete return the content of the job to file?
         #Receive-Job -Id 
-        
-        Receive-job -id $jobId | out-file $logging -append
+        write-output "----------------------------------------------------" | out-file $logging -append
+        Receive-job -id $jobId -Keep | out-file $logging -append
         write-output $computers | out-file $logging -append
+
+        write-output $pemaster
+        write-output Receive-job -id $jobId
 
 } else {
     write-output "No Computers found"
