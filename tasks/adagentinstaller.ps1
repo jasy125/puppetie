@@ -92,9 +92,11 @@ if ($computers.DNSHostName -ne "") {
     # this will us http and winrm i think alternative is to use start-job
     $jobpeagent = Invoke-Command -ComputerName $computers.DNSHostName -ScriptBlock {
         #check for puppet agent
-    <#    $compname =  $env:COMPUTERNAME;
-        $time = Get-Date -Format "MMddyyyy"; 
-       
+      $compname =  $env:COMPUTERNAME
+        $time = Get-Date -Format "MMddyyyy"
+
+        return $compname
+    <#     
         if (Get-service puppet -ErrorAction SilentlyContinue) {
             return  "Puppet Already Installed on $compname"
         } else {
