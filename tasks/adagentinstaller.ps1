@@ -17,7 +17,7 @@
 #
 
 param (
-  [String]$pemaster = $(puppet config print server), #required
+  [String]$pemaster = $(puppet config print server), # Puppet Master FQDN used to install the puppet agent, can also be a compiler
   [String]$adhost = "", #required Computer with ad on it or domain controller Probably can Remove this value
   [String]$username = "", #required User who is able to look at ad and also install on machines ie administrator
   [String]$password = "", #required admin password
@@ -29,14 +29,20 @@ param (
   [String]$dryrun = $false
 )
 
+#Switches for different if statements
 $computers = $false
 $searchPath = $false
 $setFilter = $false
 
-$pass = ConvertTo-SecureString -AsPlainText $password -Force
-$Cred = New-Object System.Management.Automation.PSCredential -ArgumentList $username,$pass
-$domain = (Get-WmiObject Win32_ComputerSystem).Domain # Not used yet but will replace having to set the DC but this gets top level. Maybe only use if dc isnt set and ou is 
+#Build credentials
 
+Function setCreds ($username,$password) {
+    $pass = ConvertTo-SecureString -AsPlainText $password -Force
+    $cred = New-Object System.Management.Automation.PSCredential -ArgumentList $username,$pass
+return $cred    
+}
+
+$cred = setCreds $username $password
 
 # Step 2
 #
@@ -74,7 +80,7 @@ if ($filter -ne $false) {
 # Step 4
 #
 # Get all the computer objects based on the collected info
-# TODO build this into a function
+# 
 #
 
 if ( $searchPath -ne $false -and $setFilter -eq $true ) {
@@ -127,7 +133,7 @@ if ($computers.DNSHostName -ne "" ) {
                 }
                 
         
-        } -credential $Cred -JobName "Puppet-Agent-Install" -ThrottleLimit $throttle -AsJob 
+        } -credential $cred -JobName "Puppet-Agent-Install" -ThrottleLimit $throttle -AsJob 
 
         # loop to check status of running job and get job id
         $jobId = $jobpeagent.id
