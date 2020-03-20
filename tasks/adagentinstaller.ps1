@@ -135,6 +135,7 @@ if ($computers.DNSHostName -ne "") {
         $joboutput = Receive-job -id $jobId
         write-output $pemaster
         write-output $joboutput
+        write-output "see results of job $logging on the AD target host"
 
 } else {
     write-output "No Computers found"
