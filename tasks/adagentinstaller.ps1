@@ -157,7 +157,7 @@ if ($computers.DNSHostName -ne "" ) {
             write-output "Filter Used : $filter" | out-file $logging -append
         }
         write-output "Number of installs where limited to batches of $throttle at a time" | out-file $logging -append
-        write-output "$($computers.DNSHostName.length) Computer/s will have the puppet agent installed, these are :" | out-file $logging -append
+        write-output "$($computers.DNSHostName.length) Computer/s will have the puppet agent installed if not already installed already, these are :" | out-file $logging -append
         write-output $computers.DNSHostName | out-file $logging -append
         
         $joboutput = Receive-job -id $jobId
