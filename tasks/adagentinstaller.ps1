@@ -147,7 +147,7 @@ if ($computers.DNSHostName -ne "" ) {
 
             Start-Sleep -s 15
         }
-        # once complete return the content of the job to file
+        # once complete return the content of the job to file ( | Tee-Object )
         write-output "----------------------------------------------------" | out-file $logging -append
         write-output " PE Master : $pemaster" | out-file $logging -append
         if ($searchPath -ne $false) {
@@ -163,7 +163,8 @@ if ($computers.DNSHostName -ne "" ) {
         $joboutput = Receive-job -id $jobId
         $joboutput | out-file $logging -append
         write-output $joboutput
-        write-output "See results of job at $logging on the AD target host"
+        write-output "See results of job at $logging on the AD target host" | Tee-Object -file $logging -append
+        
 
 } else {
     write-output "No Computers found"
