@@ -42,7 +42,7 @@
     },
     "dryrun": {
       "description": "Start installing or give list of computers from options",
-      "type": "Optional[String[1]]"
+      "type": "Optional[Boolean]"
     }
   }
 }
