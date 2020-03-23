@@ -18,7 +18,7 @@
 
 param (
   [String]$pemaster = $(puppet config print server), # Puppet Master FQDN used to install the puppet agent, can also be a compiler
-  [String]$adhost = "", #required Computer with ad on it or domain controller Probably can Remove this value
+  [String]$adhost = "", #not required as target computer is this, Computer with domain controller on it or AD Users and Computers Probably can Remove this value
   [String]$username = "", #required User who is able to look at ad and also install on machines ie administrator
   [String]$password = "", #required admin password
   [String]$dc = $false, # puppet,com comma separate this string
@@ -149,7 +149,7 @@ if ($computers.DNSHostName -ne "" ) {
         }
         # once complete return the content of the job to file
         write-output "----------------------------------------------------" | out-file $logging -append
-        write-ouput " PE Master : $pemaster" | out-file $logging -append
+        write-output " PE Master : $pemaster" | out-file $logging -append
         if ($searchPath -ne $false) {
           write-output "Targe ou : $searchPath" | out-file $logging -append
         }
