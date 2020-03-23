@@ -26,7 +26,7 @@ param (
   [String]$filter = $false, # use the filter logic ie (name -like "window-*") 
   [String]$throttle = 2,
   [String]$logging = "c:/puppet-agent-installer.log",
-  [String]$dryrun = $false
+  [String]$dryRun = $false
 )
 
 #Switches for different if statements
@@ -114,7 +114,7 @@ if ($computers.DNSHostName -ne "" ) {
             #check for puppet agent
             $compname =  $env:COMPUTERNAME
             $time = Get-Date -Format "MMddyyyy" 
-            $dryrun = $using:dryrun
+            $dryrun = $using:dryRun
   
             if (Get-service puppet -ErrorAction SilentlyContinue) {
                 $puppetinstalled = Get-WmiObject Win32_Product | Where-Object { $_.Name -Like "Puppet Agent*"}   | Select-Object Name,Version
@@ -148,24 +148,24 @@ if ($computers.DNSHostName -ne "" ) {
             Start-Sleep -s 15
         }
         # once complete return the content of the job to file ( | Tee-Object )
-        write-output "----------------------------------------------------" | out-file $logging -append
-        write-output " PE Master : $pemaster" | out-file $logging -append
+        write-output "----------------------------------------------------" | Tee-Object -file $logging -append
+        if ($dryRun -ne $false) {
+            write-output "---------------- Dry Run has been enabled ----------------" | Tee-Object -file $logging -append
+        }
+        write-output "PE Master : $pemaster" | Tee-Object -file $logging -append
+        
         if ($searchPath -ne $false) {
-          write-output "Targe ou : $searchPath" | out-file $logging -append
+          write-output "Target ou : $searchPath" | Tee-Object -file $logging -append
         }
         if ($setFilter -eq $true){
-            write-output "Filter Used : $filter" | out-file $logging -append
+            write-output "Filter Used : $filter" | Tee-Object -file $logging -append
         }
-        write-output "Number of installs where limited to batches of $throttle at a time" | out-file $logging -append
-        write-output "$($computers.DNSHostName.length) Computer/s will have the puppet agent installed if not already installed, these are :" | out-file $logging -append
-        write-output $computers.DNSHostName | out-file $logging -append
+        write-output "Number of installs where limited to batches of $throttle at a time" | Tee-Object -file $logging -append
+        write-output "$($computers.DNSHostName.length) Computer/s will have the puppet agent installed if not already installed, these are :" | Tee-Object -file $logging -append
+        write-output $computers.DNSHostName | Tee-Object -file $logging -append
         
-        $joboutput = Receive-job -id $jobId
-        $joboutput | out-file $logging -append
-        write-output $joboutput
-        write-output "See results of job at $logging on the AD target host" | Tee-Object -file $logging -append
+        Receive-job -id $jobId | Tee-Object -file $logging -append
         
-
 } else {
     write-output "No Computers found"
 } 
