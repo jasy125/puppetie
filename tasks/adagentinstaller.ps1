@@ -108,22 +108,28 @@ if ( $searchPath -ne $false -and $setFilter -eq $true ) {
 
 if ($computers.DNSHostName -ne "" ) {
 
-    if ( $dryrun -eq $false ) {
+
     # this will us http and winrm i think alternative is to use start-job
         $jobpeagent = Invoke-Command -ComputerName $computers.DNSHostName -ScriptBlock {
             #check for puppet agent
             $compname =  $env:COMPUTERNAME
             $time = Get-Date -Format "MMddyyyy" 
-        
+            $dryrun = $using:dryrun
+  
             if (Get-service puppet -ErrorAction SilentlyContinue) {
                 $puppetinstalled = Get-WmiObject Win32_Product | Where-Object { $_.Name -Like "Puppet Agent*"}   | Select-Object Name,Version
                 return "Puppet Already Installed on $compname - ( Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
             } else {
-                [System.Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; 
-                [Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}; 
-                $webClient = New-Object System.Net.WebClient; 
-                $webClient.DownloadFile('https://' + $using:pemaster + ':8140/packages/current/install.ps1', 'install.ps1') 
-                & C:\Windows\System32\install.ps1;
+
+                if($dryrun -eq $false) {
+                    [System.Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; 
+                    [Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}; 
+                    $webClient = New-Object System.Net.WebClient; 
+                    $webClient.DownloadFile('https://' + $using:pemaster + ':8140/packages/current/install.ps1', 'install.ps1') 
+                    & C:\Windows\System32\install.ps1;
+                } else {
+                    return "Puppet Agent Would have been Installed on $compname"
+                }
             }
 
             if (Get-service puppet -ErrorAction SilentlyContinue) {
@@ -141,7 +147,6 @@ if ($computers.DNSHostName -ne "" ) {
 
             Start-Sleep -s 15
         }
-    }
         # once complete return the content of the job to file
         write-output "----------------------------------------------------" | out-file $logging -append
         write-ouput " PE Master : $pemaster" | out-file $logging -append
@@ -155,12 +160,9 @@ if ($computers.DNSHostName -ne "" ) {
         write-output "$($computers.DNSHostName.length) Computer/s will have the puppet agent installed, these are :" | out-file $logging -append
         write-output $computers.DNSHostName | out-file $logging -append
         
-        
-        if($dryrun -eq $false) {
-            $joboutput = Receive-job -id $jobId
-            $joboutput | out-file $logging -append
-            write-output $joboutput
-        }
+        $joboutput = Receive-job -id $jobId
+        $joboutput | out-file $logging -append
+        write-output $joboutput
         write-output "See results of job at $logging on the AD target host"
 
 } else {
