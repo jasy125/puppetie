@@ -148,7 +148,7 @@ if ($computers.DNSHostName -ne "" ) {
             Start-Sleep -s 15
         }
         # once complete return the content of the job to file ( | Tee-Object )
-        write-output "----------------------------------------------------" | Tee-Object -file $logging -append
+        write-output "----------------------------------------------------------" | Tee-Object -file $logging -append
         if ($dryRun -ne $false) {
             write-output "---------------- Dry Run has been enabled ----------------" | Tee-Object -file $logging -append
         }

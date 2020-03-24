@@ -23,19 +23,12 @@ This Task will allow you to pull Computers from AD and install the puppet agent 
 
 ### What windowstasks affects **OPTIONAL**
 
-If it's obvious what your module touches, you can skip this section. For example, folks can probably figure out that your mysql_instance module affects their MySQL instances.
-
-If there's more that they should know about, though, this is the place to mention:
-
-* Files, packages, services, or operations that the module will alter, impact, or execute.
-* Dependencies that your module automatically installs.
-* Warnings or other important notices.
+* Gets a list of Computers based on serach criteria set, if now set will take all nodes from AD, then check for puppet agent and install if not install already directly from the puppet master which is set in the puppet.conf or the manual value set when running.
 
 ### Setup Requirements **OPTIONAL**
 
-Active Directory User and Computers
-
-Powershell V3 or later
+* Active Directory User and Computers
+* Powershell V3 or later
 
 ### Beginning with windowstasks
 
@@ -107,35 +100,7 @@ throttle : Number of jobs to run in parallel, by default this is set to two incr
 
 logging : This is the location of the log file, by default it is created on the C Drive of the system running the task. This can be any location as long as the system running the task can access it.
 
-dryrun : If you want to test the settings before running for real. Default is false ( Still work in progress for additional logging )
-
-## Reference
-
-This section is deprecated. Instead, add reference information to your code as Puppet Strings comments, and then use Strings to generate a REFERENCE.md in your module. For details on how to add code comments and generate documentation with Strings, see the Puppet Strings [documentation](https://puppet.com/docs/puppet/latest/puppet_strings.html) and [style guide](https://puppet.com/docs/puppet/latest/puppet_strings_style.html)
-
-If you aren't ready to use Strings yet, manually create a REFERENCE.md in the root of your module directory and list out each of your module's classes, defined types, facts, functions, Puppet tasks, task plans, and resource types and providers, along with the parameters for each.
-
-For each element (class, defined type, function, and so on), list:
-
-  * The data type, if applicable.
-  * A description of what the element does.
-  * Valid values, if the data type doesn't make it obvious.
-  * Default value, if any.
-
-For example:
-
-```
-### `pet::cat`
-
-#### Parameters
-
-##### `meow`
-
-Enables vocalization in your cat. Valid options: 'string'.
-
-Default: 'medium-loud'.
-```
-
+dryrun : If you want to test the settings before running for real. Default is false.
 
 
 ## Limitations
@@ -145,7 +110,7 @@ Also you will need to set the pemaster value if the host you are going to run th
 
 ## Development
 
-Please fork this repo and not run directly from it as changes may happen.
+Still in Testing Phase
 
 ## Release Notes/Contributors/Etc. **Optional**
 
