@@ -4,7 +4,7 @@
 #
 # Requires running on a machine with Active Directory Computers and Users OR Domain Controller
 #
-# TODO - Convert top variables to passed parameters - error logging
+# TODO - DONT RUN THIS TASK YET NOT TESTED
 
 
 # Step 1
@@ -102,7 +102,6 @@ if ( $searchPath -ne $false -and $setFilter -eq $true ) {
 # create a powershell job loop of the computers array or loop instances and connect via Invoke-Command ( Jobs be better as batch processing )
 
 # connect to the computer and check for existance of puppet agent service
-# May need to pass credentials 
 
 if ($computers.DNSHostName -ne "" ) {
 
