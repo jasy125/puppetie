@@ -41,11 +41,6 @@ Function setCreds ($username,$password) {
     $cred = New-Object System.Management.Automation.PSCredential -ArgumentList $username,$pass
 return $cred    
 }
-
-Function checkApp() {
-   return (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -like "puppet agent*" }) -ne $null
-}
-
 $cred = setCreds $username $password
 
 # Step 2
@@ -119,6 +114,7 @@ if ($computers.DNSHostName -ne "" ) {
             $compname =  $env:COMPUTERNAME
             $time = Get-Date -Format "MMddyyyy" 
             $dryrun = $using:dryRun
+            $uninstaller = $using:uninstaller
   
             if (Get-service puppet -ErrorAction SilentlyContinue) {
                 $puppetinstalled = Get-WmiObject Win32_Product | Where-Object { $_.Name -Like "Puppet Agent*"}   | Select-Object Name,Version
@@ -131,7 +127,7 @@ if ($computers.DNSHostName -ne "" ) {
                     $webClient = New-Object System.Net.WebClient; 
                     $webClient.DownloadFile('https://' + $using:pemaster + ':8140/packages/current/install.ps1', 'install.ps1') 
                     & C:\Windows\System32\install.ps1;
-                } else {
+                }  else {
                     return "Puppet Agent Would have been Installed on $compname"
                 }
             }
