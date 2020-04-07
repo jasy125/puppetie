@@ -1,0 +1,48 @@
+{
+  "puppet_task_version": 1,
+  "supports_noop": false,
+  "description": "Installs Puppet Via AD on all nodes that match the AD search query",
+  "parameters": {
+    "pemaster": {
+      "description": "Puppet Master to bootstrap too, not required if puppet conf has server set on AD Node",
+      "type": "Optional[String[1]]"
+    },
+    "adhost": {
+      "description": "required Computer with ad on it or domain controller",
+      "type": "Optional[String[1]]"
+    },
+    "password": {
+      "description": "admin password",
+      "type": "String[1]",
+      "sensitive": true
+    },
+     "username": {
+      "description": "User who is able to look at ad and also install on machines ie administrator",
+      "type": "String[1]"
+    },
+    "dc": {
+      "description": "puppet,com comma separate this string",
+      "type": "Optional[String[1]]"
+    },
+    "ou": {
+      "description": "computers,belfast,uk comma separate this string",
+      "type": "Optional[String[1]]"
+    },
+    "filter": {
+      "description": "use the filter logic ie (name -like window-*)",
+      "type": "Optional[String[1]]"
+    },
+    "throttle": {
+      "description": "TBC",
+      "type": "Optional[String[1]]"
+    },
+    "logging": {
+      "description": "Log output of the agent installer",
+      "type": "Optional[String[1]]"
+    },
+    "dryrun": {
+      "description": "Start installing or give list of computers from options",
+      "type": "Optional[Boolean]"
+    }
+  }
+}
