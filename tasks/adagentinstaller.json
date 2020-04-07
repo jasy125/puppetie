@@ -8,7 +8,7 @@
       "type": "Optional[String[1]]"
     },
     "adhost": {
-      "description": "required Computer with ad on it or domain controller",
+      "description": "Computer with ad on it or domain controller",
       "type": "Optional[String[1]]"
     },
     "password": {
