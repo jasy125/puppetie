@@ -17,8 +17,6 @@
 #
 
 param (
-  [String]$pemaster = $(puppet config print server), # Puppet Master FQDN used to install the puppet agent, can also be a compiler
-  [String]$adhost = "", #not required as target computer is this, Computer with domain controller on it or AD Users and Computers Probably can Remove this value
   [String]$username = "", #required User who is able to look at ad and also install on machines ie administrator
   [String]$password = "", #required admin password
   [String]$dc = $false, # puppet,com comma separate this string

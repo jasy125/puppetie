@@ -3,14 +3,6 @@
   "supports_noop": false,
   "description": "Installs Puppet Via AD on all nodes that match the AD search query",
   "parameters": {
-    "pemaster": {
-      "description": "Puppet Master to bootstrap too, not required if puppet conf has server set on AD Node",
-      "type": "Optional[String[1]]"
-    },
-    "adhost": {
-      "description": "Computer with ad on it or domain controller",
-      "type": "Optional[String[1]]"
-    },
     "password": {
       "description": "admin password",
       "type": "String[1]",
