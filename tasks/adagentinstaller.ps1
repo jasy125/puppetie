@@ -42,8 +42,8 @@ Function setCreds ($username,$password) {
 return $cred    
 }
 
-Function checkApp(){
-   return Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where { $_.DisplayName -like "puppet agent*" }) -ne $null
+Function checkApp() {
+   return (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -like "puppet agent*" }) -ne $null
 }
 
 $cred = setCreds $username $password
