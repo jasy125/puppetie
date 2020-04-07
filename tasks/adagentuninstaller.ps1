@@ -42,18 +42,6 @@ Function setCreds ($username,$password) {
 return $cred    
 }
 
-Function checkApp() {
-   return (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -like "puppet agent*" }) -ne $null
-}
-
-Function uninstaller() {
-  # Uninstall the Puppet agent if criteria is met
-
-  (Get-WmiObject -Class Win32_Product | Where-Object{$_.Name -eq "Puppet Agent*"}).uninstall
-
-  -+
-}
-
 $cred = setCreds $username $password
 
 # Step 2
@@ -127,31 +115,28 @@ if ($computers.DNSHostName -ne "" ) {
             $compname =  $env:COMPUTERNAME
             $time = Get-Date -Format "MMddyyyy" 
             $dryrun = $using:dryRun
-            $uninstaller = $using:uninstaller
+
+            Function checkApp() {
+                return (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -like "puppet agent*" }) -ne $null
+             }
+             
+             Function uninstaller() {
+               # Uninstall the Puppet agent if criteria is met
+               (Get-WmiObject -Class Win32_Product | Where-Object{$_.Name -eq "Puppet Agent*"}).uninstall
+             }
   
-            if (Get-service puppet -ErrorAction SilentlyContinue) {
+            if (checkApp) {
                 $puppetinstalled = Get-WmiObject Win32_Product | Where-Object { $_.Name -Like "Puppet Agent*"}   | Select-Object Name,Version
-                return "Puppet Already Installed on $compname - ( Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
-            } else {
-
-                if($dryrun -eq $false) {
-                    [System.Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; 
-                    [Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}; 
-                    $webClient = New-Object System.Net.WebClient; 
-                    $webClient.DownloadFile('https://' + $using:pemaster + ':8140/packages/current/install.ps1', 'install.ps1') 
-                    & C:\Windows\System32\install.ps1;
-                }  else {
-                    return "Puppet Agent Would have been Installed on $compname"
-                }
-            }
-
-            if (Get-service puppet -ErrorAction SilentlyContinue) {
-                return "Puppet Agent is now Installed on - $compname at $time"
+                if($dryrun -ne $false) {
+                    (Get-WmiObject -Class Win32_Product | Where-Object{$_.Name -eq "Puppet Agent*"}).uninstall
+                    return "Puppet Agent Removed from $compname - (Previous Install Contained Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
                 } else {
-                return "Agent Failed- $compname"
+                    return "Puppet Agent Would have been Removed from $compname - (Current Version Installed - Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
                 }
-                
-        
+               
+            } else {
+                return "Puppet Not Found on $compname - No Action taken"
+            }
         } -credential $cred -JobName "Puppet-Agent-Install" -ThrottleLimit $throttle -AsJob 
 
         # loop to check status of running job and get job id
@@ -173,8 +158,8 @@ if ($computers.DNSHostName -ne "" ) {
         if ($setFilter -eq $true){
             write-output "Filter Used : $filter" | Tee-Object -file $logging -append
         }
-        write-output "Number of uninstalls where limited to batches of $throttle at a time" | Tee-Object -file $logging -append
-        write-output "$($computers.DNSHostName.length) Computer/s will have the puppet agent removed, these are :" | Tee-Object -file $logging -append
+        write-output "Number of uninstalled where limited to batches of $throttle at a time" | Tee-Object -file $logging -append
+        write-output "$(($computers.DNSHostName).length) Computer/s will have the puppet agent installed if not already installed, these are :" | Tee-Object -file $logging -append
         write-output $computers.DNSHostName | Tee-Object -file $logging -append
         
         Receive-job -id $jobId | Tee-Object -file $logging -append
