@@ -133,12 +133,15 @@ if ($computers.DNSHostName -ne "" ) {
             if (checkApp) {
                 $puppetinstalled = Get-WmiObject Win32_Product | Where-Object { $_.Name -Like "Puppet Agent*"}   | Select-Object Name,Version
                 if($dryrun -eq $false) {
-                    $uninstall = uninstaller()
-
-                    return "Puppet Agent Removed from $compname - (Previous Install Contained Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
+                    $uninstall = uninstaller
+                    if(!$uninstall) {
+                        return "Puppet Agent Removed from $compname - (Previous Install Contained Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
+                    } else {
+                       return "Puppet Agent Failed to remove from $compname - (Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
+                       }
                 } else {
                     return "Puppet Agent Would have been Removed from $compname - (Current Version Installed - Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
-                }
+                    }
                
             } else {
                 return "Puppet Not Found on $compname - No Action taken"
