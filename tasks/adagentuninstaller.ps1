@@ -127,7 +127,7 @@ if ($computers.DNSHostName -ne "" ) {
   
             if (checkApp) {
                 $puppetinstalled = Get-WmiObject Win32_Product | Where-Object { $_.Name -Like "Puppet Agent*"}   | Select-Object Name,Version
-                if($dryrun -ne $false) {
+                if($dryrun -eq $false) {
                     (Get-WmiObject -Class Win32_Product | Where-Object{$_.Name -eq "Puppet Agent*"}).uninstall
                     return "Puppet Agent Removed from $compname - (Previous Install Contained Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
                 } else {
@@ -159,7 +159,7 @@ if ($computers.DNSHostName -ne "" ) {
             write-output "Filter Used : $filter" | Tee-Object -file $logging -append
         }
         write-output "Number of uninstalled where limited to batches of $throttle at a time" | Tee-Object -file $logging -append
-        write-output "$(($computers.DNSHostName).length) Computer/s will have the puppet agent installed if not already installed, these are :" | Tee-Object -file $logging -append
+        write-output "$($computers.DNSHostName.count) Computer/s will have the puppet agent installed if not already installed, these are :" | Tee-Object -file $logging -append
         write-output $computers.DNSHostName | Tee-Object -file $logging -append
         
         Receive-job -id $jobId | Tee-Object -file $logging -append
