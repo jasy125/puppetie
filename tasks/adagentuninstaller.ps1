@@ -23,7 +23,7 @@ param (
   [String]$ou = $false, # computers,belfast,uk comma separate this string
   [String]$filter = $false, # use the filter logic ie (name -like "window-*") 
   [String]$throttle = 2,
-  [String]$logging = "c:/puppet-agent-installer.log",
+  [String]$logging = "c:/puppet-agent-uninstaller.log",
   [String]$dryRun = $false,
   [String]$uninstall = "Puppet Agent"
 )
