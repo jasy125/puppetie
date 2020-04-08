@@ -114,10 +114,12 @@ if ($computers.DNSHostName -ne "" ) {
             $compname =  $env:COMPUTERNAME
             $time = Get-Date -Format "MMddyyyy" 
             $dryrun = $using:dryRun
+            $puppetInstalled =  (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match "Puppet Agent" }) -ne $null 
+
   
-            if (Get-service puppet -ErrorAction SilentlyContinue) {
-                $puppetinstalled = Get-WmiObject Win32_Product | Where-Object { $_.Name -Like "Puppet Agent*"}   | Select-Object Name,Version
-                return "Puppet Already Installed on $compname - ( Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
+            if ($puppetInstalled) {
+                $puppetversion =  (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match "Puppet Agent" }) | select DisplayName, DisplayVersion
+                return "Puppet Already Installed on $compname - ( Puppet: $($puppetversion.Name) Version: $($puppetversion.version) )"
             } else {
 
                 if($dryrun -eq $false) {
@@ -133,7 +135,7 @@ if ($computers.DNSHostName -ne "" ) {
 
             if (Get-service puppet -ErrorAction SilentlyContinue) {
                 return "Puppet Agent is now Installed on - $compname at $time"
-                } else {
+            } else {
                 return "Agent Failed- $compname"
                 }
                 
