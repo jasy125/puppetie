@@ -24,7 +24,7 @@ param (
   [String]$filter = $false, # use the filter logic ie (name -like "window-*") 
   [String]$throttle = 2,
   [String]$logging = "c:/puppet-agent-installer.log",
-  [String]$dryRun = $false
+  [String]$dryRun = $false,
   [String]$uninstall = "Puppet Agent"
 )
 
@@ -129,7 +129,7 @@ if ($computers.DNSHostName -ne "" ) {
 
                $outcome = checkApp
 
-             Return $outcome
+            return $outcome
             }
   
             if (checkApp $uninstall) {
