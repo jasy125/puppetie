@@ -132,7 +132,7 @@ if ($computers.DNSHostName -ne "" ) {
             return $outcome
             }
   
-            if (checkApp $uninstall) {
+            if ((checkApp $uninstall)) {
                 $appversion =  (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $uninstall }) | select DisplayName, DisplayVersion
                 if($dryrun -eq $false) {
                     $uninstaller = uninstaller
