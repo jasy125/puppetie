@@ -32,6 +32,7 @@ param (
 $computers = $false
 $searchPath = $false
 $setFilter = $false
+$time = Get-Date -Format "MMddyyyy" 
 
 #Build credentials
 
@@ -110,7 +111,7 @@ if ($computers.DNSHostName -ne "" ) {
         $jobpeagent = Invoke-Command -ComputerName $computers.DNSHostName -ScriptBlock {
             #check for puppet agent
             $compname =  $env:COMPUTERNAME
-            $time = Get-Date -Format "MMddyyyy" 
+            $time = $using:time 
             $dryrun = $using:dryRun
             $app = "Puppet Agent"
 
@@ -150,7 +151,7 @@ if ($computers.DNSHostName -ne "" ) {
             Start-Sleep -s 15
         }
         # once complete return the content of the job to file ( | Tee-Object )
-        write-output "----------------------------------------------------------" | Tee-Object -file $logging -append
+        write-output "---------------------------$time-------------------------------" | Tee-Object -file $logging -append
         if ($dryRun -ne $false) {
             write-output "---------------- Dry Run has been enabled ----------------" | Tee-Object -file $logging -append
         }
