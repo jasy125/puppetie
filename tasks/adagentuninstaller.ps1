@@ -127,7 +127,7 @@ if ($computers.DNSHostName -ne "" ) {
                $uninstall64 = $uninstall64.Trim()
                start-process "msiexec.exe" -arg "/X $uninstall64 /q" -Wait
 
-               $outcome = checkApp
+               $outcome = checkApp $uninstall
 
             return $outcome
             }
