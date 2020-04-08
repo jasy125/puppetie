@@ -106,39 +106,7 @@ if ( $searchPath -ne $false -and $setFilter -eq $true ) {
 
 if ($computers.DNSHostName -ne "" ) {
 
-    # this will us http and winrm i think alternative is to use start-job
-        $jobpeagent = Invoke-Command -ComputerName $computers.DNSHostName -ScriptBlock {
-            #check for puppet agent
-            $compname =  $env:COMPUTERNAME
-            $time = Get-Date -Format "MMddyyyy" 
-            $dryrun = $using:dryRun
-            $uninstall = $using:uninstall
-
-            
-        } -credential $cred -JobName "$uninstall-uninstall" -ThrottleLimit $throttle -AsJob 
-
-        # loop to check status of running job and get job id
-        $jobId = $jobpeagent.id
-        while($jobpeagent.state -eq "Running") {
-
-            Start-Sleep -s 15
-        }
-        # once complete return the content of the job to file ( | Tee-Object )
-        write-output "----------------------------------------------------------" | Tee-Object -file $logging -append
-        if ($dryRun -ne $false) {
-            write-output "---------------- Dry Run has been enabled ----------------" | Tee-Object -file $logging -append
-        }
-        if ($searchPath -ne $false) {
-          write-output "Target ou : $searchPath" | Tee-Object -file $logging -append
-        }
-        if ($setFilter -eq $true){
-            write-output "Filter Used : $filter" | Tee-Object -file $logging -append
-        }
-        write-output "Number of uninstalled where limited to batches of $throttle at a time" | Tee-Object -file $logging -append
-        write-output "$($computers.DNSHostName.count) Computer/s will have the $uninstall removed if it existed, these are :" | Tee-Object -file $logging -append
-        write-output $computers.DNSHostName | Tee-Object -file $logging -append
-        
-        Receive-job -id $jobId | Tee-Object -file $logging -append
+    write-output " COmputers found"
         
 } else {
     write-output "No Computers found"
