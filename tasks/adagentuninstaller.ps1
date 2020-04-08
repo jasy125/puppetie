@@ -118,23 +118,16 @@ if ($computers.DNSHostName -ne "" ) {
                 return (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $uninstallapp }) -ne $null
              }
              
-             Function uninstaller($uninstallapp) {
-               # Uninstall the Application if not Puppet
-
-               $uninstall64 = gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match $uninstallapp } | select UninstallString
-               $uninstall64 = $uninstall64.UninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X",""
-               $uninstall64 = $uninstall64.Trim()
-               start-process "msiexec.exe" -arg "/X $uninstall64 /q" -Wait
-
-               $outcome = checkApp $uninstallapp
-
-            return $outcome
-            }
-  
             if ((checkApp $app)) {
                 $appversion =  (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $app }) | select DisplayName, DisplayVersion
                 if($dryrun -eq $false) {
-                    $uninsterallcheck = uninstaller $app
+                  
+                    $uninstall64 = gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match $uninstallapp } | select UninstallString
+                    $uninstall64 = $uninstall64.UninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X",""
+                    $uninstall64 = $uninstall64.Trim()
+                    start-process "msiexec.exe" -arg "/X $uninstall64 /q" -Wait
+                    $uninsterallcheck = checkApp $uninstallapp
+
                     if(!$uninsterallcheck) {
                         return "$app Removed from $compname - (Previous Install Contained Puppet: $($appversion.Name) Version: $($appversion.version) )"
                     } else {
