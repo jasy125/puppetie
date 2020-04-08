@@ -114,7 +114,7 @@ if ($computers.DNSHostName -ne "" ) {
       
         # once complete return the content of the job to file ( | Tee-Object )
         
-        Receive-job -id $jobId | Tee-Object -file $logging -append
+       # Receive-job -id $jobId | Tee-Object -file $logging -append
         
 } else {
     write-output "No Computers found"
