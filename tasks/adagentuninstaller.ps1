@@ -109,7 +109,7 @@ if ($computers.DNSHostName -ne "" ) {
     # this will us http and winrm i think alternative is to use start-job
         $jobpeagent = Invoke-Command -ComputerName $computers.DNSHostName -ScriptBlock {
             echo "hi"
-        } -credential $cred -JobName "uninstall" -ThrottleLimit $throttle -AsJob 
+        } -credential $cred -JobName "uninstallApp" -ThrottleLimit $throttle -AsJob 
 
       
         # once complete return the content of the job to file ( | Tee-Object )
