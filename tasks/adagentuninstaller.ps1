@@ -23,9 +23,9 @@ param (
   [String]$ou = $false, # computers,belfast,uk comma separate this string
   [String]$filter = $false, # use the filter logic ie (name -like "window-*") 
   [String]$throttle = 2,
-  [String]$logging = "c:/puppet-agent-uninstaller.log",
+  [String]$logging = "c:/puppet-agent-unistaller.log",
   [String]$dryRun = $false,
-  [String]$uninstall = "Puppet Agent"
+  [String]$uninstallapp = "Puppet Agent"
 )
 
 #Switches for different if statements
@@ -112,14 +112,63 @@ if ($computers.DNSHostName -ne "" ) {
             $compname =  $env:COMPUTERNAME
             $time = Get-Date -Format "MMddyyyy" 
             $dryrun = $using:dryRun
-            $uninstallapp = $using:uninstall
+            $uninstallapp = $using:uninstallapp
 
-            write-output $uninstallapp
+             Function checkApp($uninstallapp) {
+                return (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $uninstallapp }) -ne $null
+             }
+             
+             Function uninstaller($uninstallapp) {
+               # Uninstall the Application if not Puppet
+
+               $uninstall64 = gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match $uninstallapp } | select UninstallString
+               $uninstall64 = $uninstall64.UninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X",""
+               $uninstall64 = $uninstall64.Trim()
+               start-process "msiexec.exe" -arg "/X $uninstall64 /q" -Wait
+
+               $outcome = checkApp $uninstallapp
+
+            return $outcome
+            }
+  
+            if ((checkApp $uninstallapp)) {
+                $appversion =  (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $uninstallapp }) | select DisplayName, DisplayVersion
+                if($dryrun -eq $false) {
+                    $uninsterallcheck = uninstaller $uninstallapp
+                    if(!$uninsterallcheck) {
+                        return "$uninstallapp Removed from $compname - (Previous Install Contained Puppet: $($appversion.Name) Version: $($appversion.version) )"
+                    } else {
+                       return "$uninstallapp Failed to remove from $compname - (Puppet: $($appversion.Name) Version: $($appversion.version) )"
+                       }
+                } else {
+                    return "$uninstallapp Would have been Removed from $compname - (Current Version Installed - Puppet: $($appversion.Name) Version: $($appversion.version) )"
+                    }
+               
+            } else {
+                return "$uninstall Not Found on $compname - No Action taken"
+            }
         } -credential $cred -JobName "uninstallApp" -ThrottleLimit $throttle -AsJob 
 
         # loop to check status of running job and get job id
         $jobId = $jobpeagent.id
-        
+        while($jobpeagent.state -eq "Running") {
+
+            Start-Sleep -s 15
+        }
+        # once complete return the content of the job to file ( | Tee-Object )
+        write-output "----------------------------------------------------------" | Tee-Object -file $logging -append
+        if ($dryRun -ne $false) {
+            write-output "---------------- Dry Run has been enabled ----------------" | Tee-Object -file $logging -append
+        }
+        if ($searchPath -ne $false) {
+          write-output "Target ou : $searchPath" | Tee-Object -file $logging -append
+        }
+        if ($setFilter -eq $true){
+            write-output "Filter Used : $filter" | Tee-Object -file $logging -append
+        }
+        write-output "Number of uninstalled where limited to batches of $throttle at a time" | Tee-Object -file $logging -append
+        write-output "$($computers.DNSHostName.count) Computer/s will have the $uninstall removed if it existed, these are :" | Tee-Object -file $logging -append
+        write-output $computers.DNSHostName | Tee-Object -file $logging -append
         
         Receive-job -id $jobId | Tee-Object -file $logging -append
         

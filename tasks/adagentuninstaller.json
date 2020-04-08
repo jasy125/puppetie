@@ -8,7 +8,7 @@
       "type": "String[1]",
       "sensitive": true
     },
-    "uninstall": {
+    "uninstallapp": {
       "description": "Set this value to any software on your machine that you want to remove, by default this was to uninstall the puppet agent",
       "type": "Optional[String[1]]"
     },
