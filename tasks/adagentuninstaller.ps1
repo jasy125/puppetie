@@ -112,42 +112,42 @@ if ($computers.DNSHostName -ne "" ) {
             $compname =  $env:COMPUTERNAME
             $time = Get-Date -Format "MMddyyyy" 
             $dryrun = $using:dryRun
-            $uninstall = $using:uninstall
+            $uninstallapp = $using:uninstall
 
-             Function checkApp($uninstall) {
-                return (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $uninstall }) -ne $null
+             Function checkApp($uninstallapp) {
+                return (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $uninstallapp }) -ne $null
              }
              
-             Function uninstaller($uninstall) {
+             Function uninstaller($uninstallapp) {
                # Uninstall the Application if not Puppet
 
-               $uninstall64 = gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match $uninstall } | select UninstallString
+               $uninstall64 = gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match $uninstallapp } | select UninstallString
                $uninstall64 = $uninstall64.UninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X",""
                $uninstall64 = $uninstall64.Trim()
                start-process "msiexec.exe" -arg "/X $uninstall64 /q" -Wait
 
-               $outcome = checkApp $uninstall
+               $outcome = checkApp $uninstallapp
 
             return $outcome
             }
   
-            if ((checkApp $uninstall)) {
-                $appversion =  (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $uninstall }) | select DisplayName, DisplayVersion
+            if ((checkApp $uninstallapp)) {
+                $appversion =  (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $uninstallapp }) | select DisplayName, DisplayVersion
                 if($dryrun -eq $false) {
-                    $uninstaller = uninstaller $uninstall
-                    if(!$uninstaller) {
-                        return "$uninstall Removed from $compname - (Previous Install Contained Puppet: $($appversion.Name) Version: $($appversion.version) )"
+                    $uninsterallcheck = uninstaller $uninstallapp
+                    if(!$uninsterallcheck) {
+                        return "$uninstallapp Removed from $compname - (Previous Install Contained Puppet: $($appversion.Name) Version: $($appversion.version) )"
                     } else {
-                       return "$uninstall Failed to remove from $compname - (Puppet: $($appversion.Name) Version: $($appversion.version) )"
+                       return "$uninstallapp Failed to remove from $compname - (Puppet: $($appversion.Name) Version: $($appversion.version) )"
                        }
                 } else {
-                    return "$uninstall Would have been Removed from $compname - (Current Version Installed - Puppet: $($appversion.Name) Version: $($appversion.version) )"
+                    return "$uninstallapp Would have been Removed from $compname - (Current Version Installed - Puppet: $($appversion.Name) Version: $($appversion.version) )"
                     }
                
             } else {
                 return "$uninstall Not Found on $compname - No Action taken"
             }
-        } -credential $cred -JobName "$uninstall-uninstall" -ThrottleLimit $throttle -AsJob 
+        } -credential $cred -JobName "uninstall" -ThrottleLimit $throttle -AsJob 
 
         # loop to check status of running job and get job id
         $jobId = $jobpeagent.id
