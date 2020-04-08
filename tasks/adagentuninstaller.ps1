@@ -113,7 +113,7 @@ if ($computers.DNSHostName -ne "" ) {
             $compname =  $env:COMPUTERNAME
             $time = $using:time 
             $dryrun = $using:dryRun
-            $app = "Puppet Agent"
+            $app = $using:uninstallapp
 
              Function checkApp($uninstallapp) {
                 return (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $uninstallapp }) -ne $null
