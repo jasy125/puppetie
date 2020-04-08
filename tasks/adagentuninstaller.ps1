@@ -127,13 +127,8 @@ if ($computers.DNSHostName -ne "" ) {
                     $uninstall64 = $uninstall64.UninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X",""
                     $uninstall64 = $uninstall64.Trim()
                     start-process "msiexec.exe" -arg "/X $uninstall64 /q" -Wait
-                    $uninsterallcheck = checkApp $uninstallapp
-
-                    if(!$uninsterallcheck) {
-                        return "$app Removed from $compname - (Previous Install Contained Puppet: $($appversion.Name) Version: $($appversion.version) )"
-                    } else {
-                       return "$app Failed to remove from $compname - (Puppet: $($appversion.Name) Version: $($appversion.version) )"
-                       }
+                
+                return "$app Removed from $compname - (Previous Install Contained Puppet: $($appversion.Name) Version: $($appversion.version) )"
                 } else {
                     return "$app Would have been Removed from $compname - (Current Version Installed - Puppet: $($appversion.Name) Version: $($appversion.version) )"
                     }
