@@ -25,6 +25,7 @@ param (
   [String]$throttle = 2,
   [String]$logging = "c:/puppet-agent-installer.log",
   [String]$dryRun = $false
+  [String]$uninstall = "Puppet Agent"
 )
 
 #Switches for different if statements
@@ -112,49 +113,42 @@ if ($computers.DNSHostName -ne "" ) {
             $compname =  $env:COMPUTERNAME
             $time = Get-Date -Format "MMddyyyy" 
             $dryrun = $using:dryRun
+            $uninstall = $using:uninstall
 
-            Function checkApp() {
-                return (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -like "puppet agent*" }) -ne $null
+            Function checkApp($uninstall) {
+                return (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $uninstall }) -ne $null
              }
              
-             Function uninstaller() {
-               # Uninstall the Puppet agent if criteria is met
-               $uninstall32 = gci "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match "Puppet Agent" } | select UninstallString
+             Function uninstaller($uninstall) {
+               # Uninstall the Application if not Puppet
+
                $uninstall64 = gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match "Puppet Agent" } | select UninstallString
-               
-               if ($uninstall64) {
                $uninstall64 = $uninstall64.UninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X",""
                $uninstall64 = $uninstall64.Trim()
-               Write "Uninstalling..."
                start-process "msiexec.exe" -arg "/X $uninstall64 /q" -Wait}
-               if ($uninstall32) {
-               $uninstall32 = $uninstall32.UninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X",""
-               $uninstall32 = $uninstall32.Trim()
-               Write "Uninstalling..."
-               start-process "msiexec.exe" -arg "/X $uninstall32 /q" -Wait} 
-               
+
                $outcome = checkApp
 
              Return $outcome
             }
   
-            if (checkApp) {
-                $puppetinstalled = Get-WmiObject Win32_Product | Where-Object { $_.Name -Like "Puppet Agent*"}   | Select-Object Name,Version
+            if (checkApp $uninstall) {
+                $puppetinstalled = Get-WmiObject Win32_Product | Where-Object { $_.Name -match $uninstall}   | Select-Object Name,Version
                 if($dryrun -eq $false) {
-                    $uninstall = uninstaller
-                    if(!$uninstall) {
-                        return "Puppet Agent Removed from $compname - (Previous Install Contained Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
+                    $uninstaller = uninstaller
+                    if(!$uninstaller) {
+                        return "$uninstall Removed from $compname - (Previous Install Contained Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
                     } else {
-                       return "Puppet Agent Failed to remove from $compname - (Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
+                       return "$uninstall Failed to remove from $compname - (Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
                        }
                 } else {
-                    return "Puppet Agent Would have been Removed from $compname - (Current Version Installed - Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
+                    return "$uninstall Would have been Removed from $compname - (Current Version Installed - Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
                     }
                
             } else {
-                return "Puppet Not Found on $compname - No Action taken"
+                return "$uninstall Not Found on $compname - No Action taken"
             }
-        } -credential $cred -JobName "Puppet-Agent-Install" -ThrottleLimit $throttle -AsJob 
+        } -credential $cred -JobName "$uninstall-uninstall" -ThrottleLimit $throttle -AsJob 
 
         # loop to check status of running job and get job id
         $jobId = $jobpeagent.id
@@ -167,8 +161,6 @@ if ($computers.DNSHostName -ne "" ) {
         if ($dryRun -ne $false) {
             write-output "---------------- Dry Run has been enabled ----------------" | Tee-Object -file $logging -append
         }
-        write-output "PE Master : $pemaster" | Tee-Object -file $logging -append
-        
         if ($searchPath -ne $false) {
           write-output "Target ou : $searchPath" | Tee-Object -file $logging -append
         }
@@ -176,7 +168,7 @@ if ($computers.DNSHostName -ne "" ) {
             write-output "Filter Used : $filter" | Tee-Object -file $logging -append
         }
         write-output "Number of uninstalled where limited to batches of $throttle at a time" | Tee-Object -file $logging -append
-        write-output "$($computers.DNSHostName.count) Computer/s will have the puppet agent installed if not already installed, these are :" | Tee-Object -file $logging -append
+        write-output "$($computers.DNSHostName.count) Computer/s will have the $uninstall installed if not already installed, these are :" | Tee-Object -file $logging -append
         write-output $computers.DNSHostName | Tee-Object -file $logging -append
         
         Receive-job -id $jobId | Tee-Object -file $logging -append
