@@ -109,15 +109,48 @@ if ($computers.DNSHostName -ne "" ) {
     # this will us http and winrm i think alternative is to use start-job
         $jobpeagent = Invoke-Command -ComputerName $computers.DNSHostName -ScriptBlock {
             #check for puppet agent
-           echo "hello"
+            $compname =  $env:COMPUTERNAME
+            $time = Get-Date -Format "MMddyyyy" 
+            $dryrun = $using:dryRun
+            $app = "Puppet Agent"
+
+             Function checkApp($uninstallapp) {
+                return (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $uninstallapp }) -ne $null
+             }
+             
+             Function uninstaller($uninstallapp) {
+               # Uninstall the Application if not Puppet
+
+               $uninstall64 = gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match $uninstallapp } | select UninstallString
+               $uninstall64 = $uninstall64.UninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X",""
+               $uninstall64 = $uninstall64.Trim()
+               start-process "msiexec.exe" -arg "/X $uninstall64 /q" -Wait
+
+               $outcome = checkApp $uninstallapp
+
+            return $outcome
+            }
+  
+            if ((checkApp $app)) {
+                $appversion =  (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $app }) | select DisplayName, DisplayVersion
+                if($dryrun -eq $false) {
+                    $uninsterallcheck = uninstaller $app
+                    if(!$uninsterallcheck) {
+                        return "$app Removed from $compname - (Previous Install Contained Puppet: $($appversion.Name) Version: $($appversion.version) )"
+                    } else {
+                       return "$app Failed to remove from $compname - (Puppet: $($appversion.Name) Version: $($appversion.version) )"
+                       }
+                } else {
+                    return "$app Would have been Removed from $compname - (Current Version Installed - Puppet: $($appversion.Name) Version: $($appversion.version) )"
+                    }
+               
+            } else {
+                return "$app Not Found on $compname - No Action taken"
+            }
         } -credential $cred -JobName "uninstallApp" -ThrottleLimit $throttle -AsJob 
 
         # loop to check status of running job and get job id
         $jobId = $jobpeagent.id
-        while($jobpeagent.state -eq "Running") {
-
-            Start-Sleep -s 15
-        }
         # once complete return the content of the job to file ( | Tee-Object )
         write-output "----------------------------------------------------------" | Tee-Object -file $logging -append
         if ($dryRun -ne $false) {
@@ -130,7 +163,7 @@ if ($computers.DNSHostName -ne "" ) {
             write-output "Filter Used : $filter" | Tee-Object -file $logging -append
         }
         write-output "Number of uninstalled where limited to batches of $throttle at a time" | Tee-Object -file $logging -append
-        write-output "$($computers.DNSHostName.count) Computer/s will have the $uninstall removed if it existed, these are :" | Tee-Object -file $logging -append
+        write-output "$($computers.DNSHostName.count) Computer/s will have the $uninstallapp removed if it existed, these are :" | Tee-Object -file $logging -append
         write-output $computers.DNSHostName | Tee-Object -file $logging -append
         
         Receive-job -id $jobId | Tee-Object -file $logging -append
