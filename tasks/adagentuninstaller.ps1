@@ -106,7 +106,6 @@ if ( $searchPath -ne $false -and $setFilter -eq $true ) {
 
 if ($computers.DNSHostName -ne "" ) {
 
-
     # this will us http and winrm i think alternative is to use start-job
         $jobpeagent = Invoke-Command -ComputerName $computers.DNSHostName -ScriptBlock {
             #check for puppet agent
@@ -115,39 +114,7 @@ if ($computers.DNSHostName -ne "" ) {
             $dryrun = $using:dryRun
             $uninstall = $using:uninstall
 
-            Function checkApp($uninstall) {
-                return (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $uninstall }) -ne $null
-             }
-             
-             Function uninstaller($uninstall) {
-               # Uninstall the Application if not Puppet
-
-               $uninstall64 = gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match $uninstall } | select UninstallString
-               $uninstall64 = $uninstall64.UninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X",""
-               $uninstall64 = $uninstall64.Trim()
-               start-process "msiexec.exe" -arg "/X $uninstall64 /q" -Wait
-
-               $outcome = checkApp $uninstall
-
-            return $outcome
-            }
-  
-            if ((checkApp $uninstall)) {
-                $appversion =  (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $uninstall }) | select DisplayName, DisplayVersion
-                if($dryrun -eq $false) {
-                    $uninstaller = uninstaller
-                    if(!$uninstaller) {
-                        return "$uninstall Removed from $compname - (Previous Install Contained Puppet: $($appversion.Name) Version: $($appversion.version) )"
-                    } else {
-                       return "$uninstall Failed to remove from $compname - (Puppet: $($appversion.Name) Version: $($appversion.version) )"
-                       }
-                } else {
-                    return "$uninstall Would have been Removed from $compname - (Current Version Installed - Puppet: $($appversion.Name) Version: $($appversion.version) )"
-                    }
-               
-            } else {
-                return "$uninstall Not Found on $compname - No Action taken"
-            }
+            
         } -credential $cred -JobName "$uninstall-uninstall" -ThrottleLimit $throttle -AsJob 
 
         # loop to check status of running job and get job id
