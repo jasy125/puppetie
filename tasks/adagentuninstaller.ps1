@@ -123,7 +123,7 @@ if ($computers.DNSHostName -ne "" ) {
                 $appversion =  (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $app }) | select DisplayName, DisplayVersion
                 if($dryrun -eq $false) {
                   
-                    $uninstall64 = gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match $uninstallapp } | select UninstallString
+                    $uninstall64 = gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match $ $app } | select UninstallString
                     $uninstall64 = $uninstall64.UninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X",""
                     $uninstall64 = $uninstall64.Trim()
                     start-process "msiexec.exe" -arg "/X $uninstall64 /q" -Wait
