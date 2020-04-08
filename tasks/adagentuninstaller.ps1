@@ -23,7 +23,7 @@ param (
   [String]$ou = $false, # computers,belfast,uk comma separate this string
   [String]$filter = $false, # use the filter logic ie (name -like "window-*") 
   [String]$throttle = 2,
-  [String]$logging = "c:/puppet-agent-unistaller.log",
+  [String]$logging = "c:/puppet-agent-uninstaller.log",
   [String]$dryRun = $false,
   [String]$uninstallapp = "Puppet Agent"
 )
@@ -151,6 +151,11 @@ if ($computers.DNSHostName -ne "" ) {
 
         # loop to check status of running job and get job id
         $jobId = $jobpeagent.id
+
+        while($jobpeagent.state -eq "Running") {
+
+            Start-Sleep -s 15
+        }
         # once complete return the content of the job to file ( | Tee-Object )
         write-output "----------------------------------------------------------" | Tee-Object -file $logging -append
         if ($dryRun -ne $false) {
