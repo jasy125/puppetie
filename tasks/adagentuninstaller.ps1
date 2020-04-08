@@ -111,12 +111,7 @@ if ($computers.DNSHostName -ne "" ) {
             echo "hi"
         } -credential $cred -JobName "uninstall" -ThrottleLimit $throttle -AsJob 
 
-        # loop to check status of running job and get job id
-        $jobId = $jobpeagent.id
-        while($jobpeagent.state -eq "Running") {
-
-            Start-Sleep -s 15
-        }
+      
         # once complete return the content of the job to file ( | Tee-Object )
         
         Receive-job -id $jobId | Tee-Object -file $logging -append
