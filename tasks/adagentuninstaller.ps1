@@ -133,16 +133,16 @@ if ($computers.DNSHostName -ne "" ) {
             }
   
             if (checkApp $uninstall) {
-                $puppetinstalled = Get-WmiObject Win32_Product | Where-Object { $_.Name -match $uninstall}   | Select-Object Name,Version
+                $appversion =  (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $uninstall }) | select DisplayName, DisplayVersion
                 if($dryrun -eq $false) {
                     $uninstaller = uninstaller
                     if(!$uninstaller) {
-                        return "$uninstall Removed from $compname - (Previous Install Contained Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
+                        return "$uninstall Removed from $compname - (Previous Install Contained Puppet: $($appversion.Name) Version: $($appversion.version) )"
                     } else {
-                       return "$uninstall Failed to remove from $compname - (Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
+                       return "$uninstall Failed to remove from $compname - (Puppet: $($appversion.Name) Version: $($appversion.version) )"
                        }
                 } else {
-                    return "$uninstall Would have been Removed from $compname - (Current Version Installed - Puppet: $($puppetinstalled.Name) Version: $($puppetinstalled.version) )"
+                    return "$uninstall Would have been Removed from $compname - (Current Version Installed - Puppet: $($appversion.Name) Version: $($appversion.version) )"
                     }
                
             } else {
@@ -168,7 +168,7 @@ if ($computers.DNSHostName -ne "" ) {
             write-output "Filter Used : $filter" | Tee-Object -file $logging -append
         }
         write-output "Number of uninstalled where limited to batches of $throttle at a time" | Tee-Object -file $logging -append
-        write-output "$($computers.DNSHostName.count) Computer/s will have the $uninstall installed if not already installed, these are :" | Tee-Object -file $logging -append
+        write-output "$($computers.DNSHostName.count) Computer/s will have the $uninstall removed if it existed, these are :" | Tee-Object -file $logging -append
         write-output $computers.DNSHostName | Tee-Object -file $logging -append
         
         Receive-job -id $jobId | Tee-Object -file $logging -append
