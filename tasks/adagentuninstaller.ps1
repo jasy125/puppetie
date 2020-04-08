@@ -125,7 +125,7 @@ if ($computers.DNSHostName -ne "" ) {
                $uninstall64 = gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match "Puppet Agent" } | select UninstallString
                $uninstall64 = $uninstall64.UninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X",""
                $uninstall64 = $uninstall64.Trim()
-               start-process "msiexec.exe" -arg "/X $uninstall64 /q" -Wait}
+               start-process "msiexec.exe" -arg "/X $uninstall64 /q" -Wait
 
                $outcome = checkApp
 
