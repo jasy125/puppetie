@@ -119,12 +119,21 @@ if ($computers.DNSHostName -ne "" ) {
              
              Function uninstaller() {
                # Uninstall the Puppet agent if criteria is met
-               (Get-WmiObject -Class Win32_Product | Where-Object{$_.Name -like "Puppet Agent*"}).uninstall
+               $uninstall32 = gci "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match "Puppet Agent" } | select UninstallString
+               $uninstall64 = gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match "Puppet Agent" } | select UninstallString
                
-               while(checkApp) {
-                 Start-Sleep -s 15
-                }
-                $outcome = checkApp
+               if ($uninstall64) {
+               $uninstall64 = $uninstall64.UninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X",""
+               $uninstall64 = $uninstall64.Trim()
+               Write "Uninstalling..."
+               start-process "msiexec.exe" -arg "/X $uninstall64 /q" -Wait}
+               if ($uninstall32) {
+               $uninstall32 = $uninstall32.UninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X",""
+               $uninstall32 = $uninstall32.Trim()
+               Write "Uninstalling..."
+               start-process "msiexec.exe" -arg "/X $uninstall32 /q" -Wait} 
+               
+               $outcome = checkApp
 
              Return $outcome
             }
