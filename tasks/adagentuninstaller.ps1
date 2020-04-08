@@ -114,7 +114,7 @@ if ($computers.DNSHostName -ne "" ) {
             $dryrun = $using:dryRun
             $uninstallapp = $using:uninstall
 
-             
+            write-output $uninstallapp
         } -credential $cred -JobName "uninstallApp" -ThrottleLimit $throttle -AsJob 
 
         # loop to check status of running job and get job id
