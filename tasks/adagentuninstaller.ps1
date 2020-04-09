@@ -127,11 +127,24 @@ if ($computers.DNSHostName -ne "" ) {
 
                 if($dryrun -eq $false) {
                   
+                  
                     $uninstall64 = gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match $app } | select UninstallString
-                    $uninstall64 = $uninstall64.UninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X",""
-                    $uninstall64 = $uninstall64.Trim()
-                    start-process "msiexec.exe" -arg "/X $uninstall64 /q" -Wait
+                    
+                     #Check if this is .exe and use cmd to uninstall
+                     $endofstring = $uninstall64.UninstallString.Replace('"','')
+                     $endofstring = $endofstring.Substring($endofstring.length-4,4).trim() 
+ 
 
+                     if($endofstring -eq ".exe") {
+
+                        $uninstall64 /s | cmd
+
+                     } else {
+                        $uninstall64 = $uninstall64.UninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X",""
+                        $uninstall64 = $uninstall64.Trim()
+                        start-process "msiexec.exe" -arg "/X $uninstall64 /q" -Wait
+                     }
+ 
                     Start-Sleep -s 10
 
                     $checkUninstall = (gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match $app }) -ne $null
