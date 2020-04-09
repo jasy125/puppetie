@@ -121,7 +121,7 @@ if ($computers.DNSHostName -ne "" ) {
                 $appversion = (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $app }) | select DisplayName, DisplayVersion
 
                 if($appversion.count -gt 1){
-                    return "Multiple Version of this app or similar names found these are $appversion - Update app name with the one you want to remove and run again"
+                    return "Multiple Version of this app or similar names found these are $appversion - Update uninstallapp variable with the one you want to remove and run again"
                 }
 
                 if($dryrun -eq $false) {
@@ -131,9 +131,17 @@ if ($computers.DNSHostName -ne "" ) {
                     $uninstall64 = $uninstall64.Trim()
                     start-process "msiexec.exe" -arg "/X $uninstall64 /q" -Wait
 
+                    Start-Sleep -s 10
+
                     $checkUninstall = (gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match $app }) -ne $null
+
+                    if($checkUninstall){
+                        return "$app failed to be removed from $compname"
+                    } else {
+                        return "$app Removed from $compname - (Previous Install Contained Puppet: $($appversion.Name) Version: $($appversion.version) )"
+                    }
                 
-                return "$app Removed from $compname - (Previous Install Contained Puppet: $($appversion.Name) Version: $($appversion.version) )"
+                
                 } else {
                     return "$app Would have been Removed from $compname - (Current Version Installed - Puppet: $($appversion.Name) Version: $($appversion.version) )"
                     }
