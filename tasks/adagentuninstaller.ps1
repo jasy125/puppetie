@@ -115,18 +115,23 @@ if ($computers.DNSHostName -ne "" ) {
             $dryrun = $using:dryRun
             $app = $using:uninstallapp
 
-             Function checkApp($uninstallapp) {
-                return (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $uninstallapp }) -ne $null
-             }
+             $appexists = (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $app }) -ne $null
              
-            if ((checkApp $app)) {
-                $appversion =  (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $app }) | select DisplayName, DisplayVersion
+            if ($appexists) {
+                $appversion = (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $app }) | select DisplayName, DisplayVersion
+
+                if($appversion.count -gt 1){
+                    return "Multiple Version of this app or similar names found these are $appversion - Update app name with the one you want to remove and run again"
+                }
+
                 if($dryrun -eq $false) {
                   
                     $uninstall64 = gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match $app } | select UninstallString
                     $uninstall64 = $uninstall64.UninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X",""
                     $uninstall64 = $uninstall64.Trim()
                     start-process "msiexec.exe" -arg "/X $uninstall64 /q" -Wait
+
+                    $checkUninstall = (gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match $app }) -ne $null
                 
                 return "$app Removed from $compname - (Previous Install Contained Puppet: $($appversion.Name) Version: $($appversion.version) )"
                 } else {
