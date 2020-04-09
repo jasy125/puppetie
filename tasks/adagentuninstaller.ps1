@@ -137,7 +137,7 @@ if ($computers.DNSHostName -ne "" ) {
 
                      if($endofstring -eq ".exe") {
 
-                        $uninstall64 /s | cmd
+                        "$uninstall64 /s" | cmd
 
                      } else {
                         $uninstall64 = $uninstall64.UninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X",""
