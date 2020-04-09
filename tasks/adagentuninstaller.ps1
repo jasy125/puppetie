@@ -120,7 +120,7 @@ if ($computers.DNSHostName -ne "" ) {
             if ($appexists) {
                 $appversion = (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match $app }) | select DisplayName, DisplayVersion
 
-                if($appversion.count -gt 1){
+                if($appversion.count -gt 1) {
                     return ("Multiple Version of this app or similar names found these are : " + ($appversion | % { echo  $_.DisplayName; echo $_.DisplayVersion; echo ", "; }) + " Update uninstallapp variable with the one you want to remove and run again")
                 } 
 
