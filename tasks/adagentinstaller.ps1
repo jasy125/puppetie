@@ -34,7 +34,7 @@ $computers = $false
 $searchPath = $false
 $setFilter = $false
 
-#Build credentials
+#Build credentials - id like to pass in a secure credentials file that is existing on the node at this stage instead of passing values via puppet.
 
 Function setCreds ($username,$password) {
     $pass = ConvertTo-SecureString -AsPlainText $password -Force
@@ -119,7 +119,7 @@ if ($computers.DNSHostName -ne "" ) {
   
             if ($puppetInstalled) {
                 $puppetversion =  (Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where { $_.DisplayName -match "Puppet Agent" }) | select DisplayName, DisplayVersion
-                return "Puppet Already Installed on $compname - ( Puppet: $($puppetversion.Name) Version: $($puppetversion.version) )"
+                return "Puppet Already Installed on $compname - ( Puppet: $($puppetversion.DisplayName) Version: $($puppetversion.DisplayVersion) )"
             } else {
 
                 if($dryrun -eq $false) {
