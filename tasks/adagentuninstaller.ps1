@@ -4,7 +4,7 @@
 #
 # Requires running on a machine with Active Directory Computers and Users OR Domain Controller
 #
-# TODO - DONT RUN THIS TASK YET NOT TESTED
+# TODO - DONT RUN THIS TASK YET NOT TESTED Still being worked on
 
 
 # Step 1
@@ -136,9 +136,7 @@ if ($computers.DNSHostName -ne "" ) {
  
 
                      if($endofstring -eq ".exe") {
-
                         "$uninstall64 /s" | cmd
-
                      } else {
                         $uninstall64 = $uninstall64.UninstallString -Replace "msiexec.exe","" -Replace "/I","" -Replace "/X",""
                         $uninstall64 = $uninstall64.Trim()
@@ -149,15 +147,21 @@ if ($computers.DNSHostName -ne "" ) {
 
                     $checkUninstall = (gci "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | foreach { gp $_.PSPath } | ? { $_ -match $app }) -ne $null
 
+                    if($app -eq "Puppet Agent") {
+                        #Delete the ssl dir in program data remove all traces of puppet
+                        Remove-Item –path "C:\ProgramData\PuppetLabs" –recurse
+                        Remove-Item –path "C:\Program Files\Puppet Labs\Puppet" –recurse
+                    }
+
                     if($checkUninstall){
                         return "$app failed to be removed from $compname"
                     } else {
-                        return "$app Removed from $compname - (Previous Install Contained Puppet: $($appversion.Name) Version: $($appversion.version) )"
+                        return "$app Removed from $compname - (Previous Install Contained Puppet: $($appversion.DisplayName) Version: $($appversion.DisplayVersion) )"
                     }
                 
                 
                 } else {
-                    return "$app Would have been Removed from $compname - (Current Version Installed - Puppet: $($appversion.Name) Version: $($appversion.version) )"
+                    return "$app Would have been Removed from $compname - (Current Version Installed - Puppet: $($appversion.DisplayName) Version: $($appversion.DisplayVersion) )"
                     }
                
             } else {
@@ -184,7 +188,7 @@ if ($computers.DNSHostName -ne "" ) {
             write-output "Filter Used : $filter" | Tee-Object -file $logging -append
         }
         write-output "Number of uninstalled where limited to batches of $throttle at a time" | Tee-Object -file $logging -append
-        write-output "$($computers.DNSHostName.count) Computer/s will have the $uninstallapp removed if it existed, these are :" | Tee-Object -file $logging -append
+        write-output "$($computers.DNSHostName.count) Computer/s will have $uninstallapp removed if it existed/no errors, these are :" | Tee-Object -file $logging -append
         write-output $computers.DNSHostName | Tee-Object -file $logging -append
         
         Receive-job -id $jobId | Tee-Object -file $logging -append
