@@ -23,7 +23,7 @@ This Task will allow you to pull Computers from AD and install the puppet agent 
 
 ### What windowstasks affects **OPTIONAL**
 
-* Gets a list of Computers based on serach criteria set, if now set will take all nodes from AD, then check for puppet agent and install if not install already directly from the puppet master which is set in the puppet.conf or the manual value set when running.
+* Gets a list of Computers based on serach criteria set, if no criteria is set it will take all nodes from AD, then check for puppet agent and install if not install already. This installs directly from the puppet master which is set in the puppet.conf or by manualy setting this value against any Puppet Master.
 
 ### Setup Requirements **OPTIONAL**
 
