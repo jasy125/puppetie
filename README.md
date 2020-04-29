@@ -55,9 +55,9 @@ Password : The Domain User Account
 
 #### Optional
 
-pemaster : The Pe Master is optional if the System going to be running the command has the server value set in the puppet.conf as this pulls this value using - puppet config print server
+pemaster : The Pe Master is optional if the System going to be running the command on a server which has a puppet.conf with the server value set as this pulls the value using - puppet config print server
 
-adhost : Will be used in a later revision.
+adhost : Will be used in a later revision possibly.
 
 dc : Domain Name such as puppet.local, this should be written as puppet,local. This should be used with an OU
 
@@ -96,7 +96,7 @@ filter = (Name -like "Win10*")
        
 ```
 
-throttle : Number of jobs to run in parallel, by default this is set to two increase to as many as you want to run at the same time.
+throttle : Number of jobs to run in parallel, by default this limit is two, increase this value to as many as you want, but make sure you have the performance to cope with these connections.
 
 logging : This is the location of the log file, by default it is created on the C Drive of the system running the task. This can be any location as long as the system running the task can access it.
 
