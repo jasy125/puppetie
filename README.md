@@ -1,9 +1,5 @@
 # windowstasks
 
-Welcome to your new module. A short overview of the generated parts can be found in the PDK documentation at https://puppet.com/pdk/latest/pdk_generating_modules.html .
-
-The README template below provides a starting point with details about what information to include in your README.
-
 #### Table of Contents
 
 1. [Description](#description)
@@ -21,11 +17,11 @@ This Task will allow you to pull Computers from AD and install the puppet agent 
 
 ## Setup
 
-### What windowstasks affects **OPTIONAL**
+### What windowstasks affects
 
 * Gets a list of Computers based on serach criteria set, if no criteria is set it will take all nodes from AD, then check for puppet agent and install if not install already. This installs directly from the puppet master which is set in the puppet.conf or by manualy setting this value against any Puppet Master.
 
-### Setup Requirements **OPTIONAL**
+### Setup Requirements
 
 * Active Directory User and Computers
 * Powershell V3 or later
@@ -102,7 +98,6 @@ logging : This is the location of the log file, by default it is created on the 
 
 dryrun : If you want to test the settings before running for real. Default is false.
 
-
 ## Limitations
 
 This needs to be run on an System that has AD Tools or directly on a Domain Controller
@@ -110,9 +105,9 @@ Also you will need to set the pemaster value if the host you are going to run th
 
 ## Development
 
-Still in Testing Phase
+Still in Testing Phase - but feel free to reach out with ideas or improvements.
 
-## Release Notes/Contributors/Etc. **Optional**
+## Release Notes/Contributors/Etc
 
 Contributers 
 
