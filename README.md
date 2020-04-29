@@ -36,12 +36,12 @@ You can include this Task by first forking the module and then installing with y
 
 ```
 mod 'puppetie'
-  git : 'https://github.com/jasy125/puppetie' ( Update to path to your fork )
+  git : 'https://github.com/jasy125/puppetie' ( Update path to your fork )
 ```
 
 ## Usage
 
-To use this task by default will run against then entire Domain unless you set the OU and DC.
+To use this task by default will run against then entire Domain unless you set the OU or filters.
 
 #### Required
 
@@ -105,8 +105,8 @@ dryrun : If you want to test the settings before running for real. Default is fa
 
 ## Limitations
 
-This needs to be run on an System that has Active Directory Users and Computers or directly on a Domain Controller
-Also you will need to set the pemaster value if the host you are going to run this on does not have a puppet.conf file with the server value set. Also you can point this at any master by using this field.
+This needs to be run on an System that has AD Tools or directly on a Domain Controller
+Also you will need to set the pemaster value if the host you are going to run this on does not have a puppet.conf file with the server value set or if you are using server_list. You can also point this at any master by using this field.
 
 ## Development
 
