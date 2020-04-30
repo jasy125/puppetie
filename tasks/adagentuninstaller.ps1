@@ -151,6 +151,8 @@ if ($computers.DNSHostName -ne "" ) {
                         #Delete the ssl dir in program data remove all traces of puppet
                         Remove-Item –path "C:\ProgramData\PuppetLabs" –recurse
                         Remove-Item –path "C:\Program Files\Puppet Labs\Puppet" –recurse
+
+                        Start-Sleep -s 10
                     }
 
                     if($checkUninstall){
